@@ -7,7 +7,7 @@
 
 ## Commands
 
-### DelegateCommand and DelegateCommand<T>
+### DelegateCommand
 
 Example
 
