@@ -270,7 +270,7 @@ public class Bootstrapper : UnityBootstrapperBase
     protected override void RegisterTypes()
     {
         // Services
-        Container.RegisterSingleton<INavigationService, PrismNavigationService>();
+        Container.RegisterSingleton<INavigationService, NavigationService>();
         Container.RegisterSingleton<IAuth, FakeAuth>();
 
         // ViewModels
@@ -294,7 +294,7 @@ public class Bootstrapper : MicrosoftDependencyInjectionBootstrapperBase
     protected override void RegisterTypes()
     {
         // Services
-        Services.AddSingleton<INavigationService, PrismNavigationService>();
+        Services.AddSingleton<INavigationService, NavigationService>();
         Services.AddSingleton<IAuth, FakeAuth>();
         // ViewModels
         Services.RegisterForNavigation<ViewBViewModel>();

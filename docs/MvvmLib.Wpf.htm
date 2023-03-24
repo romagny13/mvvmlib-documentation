@@ -402,7 +402,7 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
     protected override void RegisterTypes()
     {
         // Services
-        Container.RegisterSingleton&lt;INavigationService, PrismNavigationService&gt;();
+        Container.RegisterSingleton&lt;INavigationService, NavigationService&gt;();
         Container.RegisterSingleton&lt;IAuth, FakeAuth&gt;();
 
         // ViewModels
@@ -423,7 +423,7 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
     protected override void RegisterTypes()
     {
         // Services
-        Services.AddSingleton&lt;INavigationService, PrismNavigationService&gt;();
+        Services.AddSingleton&lt;INavigationService, NavigationService&gt;();
         Services.AddSingleton&lt;IAuth, FakeAuth&gt;();
         // ViewModels
         Services.RegisterForNavigation&lt;ViewBViewModel&gt;();
