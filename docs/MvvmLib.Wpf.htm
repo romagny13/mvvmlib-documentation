@@ -700,7 +700,7 @@ public static class NavigationContextExtensions
 <p>Example with NavigationBehaviors and binding for Selectors (ListBox mutliple, TabControl, etc.)</p>
 <pre><code class="cs">public class CustomNavigationService : NavigationService, ICustomNavigationService
 {
-    INavigationJournal _journal;
+    private INavigationJournal _journal;
     private List&lt;INavigationBehavior&gt; _behaviors;
 
     public CustomNavigationService()

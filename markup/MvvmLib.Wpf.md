@@ -603,7 +603,7 @@ Example with NavigationBehaviors and binding for Selectors (ListBox mutliple, Ta
 ```cs
 public class CustomNavigationService : NavigationService, ICustomNavigationService
 {
-    INavigationJournal _journal;
+    private INavigationJournal _journal;
     private List<INavigationBehavior> _behaviors;
 
     public CustomNavigationService()
