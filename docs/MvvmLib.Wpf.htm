@@ -39,7 +39,11 @@
 
 <li class="tocentry"><a href="#navigation">Navigation</a></li>
 
+<li class="tocentry"><a href="#bootstrapper">Bootstrapper</a></li>
+
 <li class="tocentry"><a href="#containerlocator">ContainerLocator</a></li>
+
+<li class="tocentry"><a href="#change-the-mvvm-interfaces-used-by-the-navigation-service">Change the Mvvm interfaces used by the Navigation Service</a></li>
 
 <li class="tocentry"><a href="#create-a-custom-navigation-service">Create a custom Navigation Service</a></li>
 
@@ -276,6 +280,17 @@ View model name:
 &lt;Button Command=&quot;{Binding NavigationCommands.NavigateCommand}&quot; CommandParameter=&quot;ViewA?id=sample-id&quot;&gt;View A (Guards)&lt;/Button&gt;&gt;
 </code></pre>
 
+<p>In code</p>
+<pre><code class="cs">NavigationService.Navigate(&quot;ViewA&quot;);
+// With parameters
+NavigationService.Navigate(&quot;ViewA&quot;, new NavigateParameters
+{
+    { &quot;id&quot;, 10 }
+});
+// ViewModel
+NavigationService.Navigate(&quot;ViewAViewModel&quot;);
+</code></pre>
+
 <p>Replace: example remove LoginView from navigation journal</p>
 <pre><code class="cs">public class LoginViewModel : ISupportNavigation
 {
@@ -354,8 +369,7 @@ View model name:
 </code></pre>
 
 <h3 id="registering-views-and-view-models-for-navigation">Registering views (and view models) for navigation<a class="headerlink" href="#registering-views-and-view-models-for-navigation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<h4 id="configurablenavigationservice">ConfigurableNavigationService<a class="headerlink" href="#configurablenavigationservice" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h4>
-<p>Easy to configure for navigation (do not require to use a bootstrapper)</p>
+<p><code>ConfigurableNavigationService</code> is easy to configure (do not require to use a bootstrapper)</p>
 <pre><code class="cs">var navigationService = new ConfigurableNavigationService
 {
     PageAssociations = new Dictionary&lt;string, Type&gt;
@@ -372,7 +386,8 @@ View model name:
 navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or RegisterViewsInNamespaceOf
 </code></pre>
 
-<h4 id="navigationservice-with-a-bootstrapper">NavigationService with a Bootstrapper<a class="headerlink" href="#navigationservice-with-a-bootstrapper" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h4>
+<p><code>NavigationService</code>: it's better to use a Bootstrapper (to register views for navigation) ...</p>
+<h2 id="bootstrapper">Bootstrapper<a class="headerlink" href="#bootstrapper" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>Examples</p>
 <p>With <code>MvvmLib.Unity</code></p>
 <pre><code class="cs">public class Bootstrapper : UnityBootstrapperBase
@@ -477,31 +492,31 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
 {
     // etc.
 
-    public void CanActivate(NavigateContext navigationContext, Action&lt;bool&gt; continuationCallback)
+    public void CanActivate(NavigateContext context, Action&lt;bool&gt; continuationCallback)
     {
         var can = MessageBox.Show($&quot;Activate {nameof(ViewAViewModel)}?&quot;, &quot;Confirmation&quot;, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
         continuationCallback(can);
     }
 
-    public void CanDeactivate(NavigateContext navigationContext, Action&lt;bool&gt; continuationCallback)
+    public void CanDeactivate(NavigateContext context, Action&lt;bool&gt; continuationCallback)
     {
         var can = MessageBox.Show($&quot;Deactivate {nameof(ViewAViewModel)}?&quot;, &quot;Confirmation&quot;, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
         continuationCallback(can);
     }
 
     // returns always the same View/ViewModel if the pageKey of the uri is ViewA
-    public bool IsNavigationTarget(NavigateContext navigationContext) =&gt; navigationContext.PageKey == &quot;ViewA&quot;;
+    public bool IsNavigationTarget(NavigateContext context) =&gt; context.PageKey == &quot;ViewA&quot;;
 
-    public void OnNavigatedFrom(NavigateContext navigationContext)  { }
+    public void OnNavigatedFrom(NavigateContext context)  { }
 
-    public void OnNavigatedTo(NavigateContext navigationContext)
+    public void OnNavigatedTo(NavigateContext context)
     {
-        var id = navigationContext.Parameters.GetValue&lt;string&gt;(&quot;id&quot;);
+        var id = context.Parameters.GetValue&lt;string&gt;(&quot;id&quot;);
     }
 }
 </code></pre>
 
-<h3 id="easy-to-customize-navigation-service">Easy to customize Navigation Service<a class="headerlink" href="#easy-to-customize-navigation-service" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<h2 id="change-the-mvvm-interfaces-used-by-the-navigation-service">Change the Mvvm interfaces used by the Navigation Service<a class="headerlink" href="#change-the-mvvm-interfaces-used-by-the-navigation-service" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>Example: replace to use Prism interfaces</p>
 <pre><code class="cs">public class PrismNavigationService : NavigationService
 {

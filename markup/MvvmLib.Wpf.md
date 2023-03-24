@@ -134,6 +134,19 @@ Bind commands in view
 <Button Command="{Binding NavigationCommands.NavigateCommand}" CommandParameter="ViewA?id=sample-id">View A (Guards)</Button>>
 ```
 
+In code
+
+```cs
+NavigationService.Navigate("ViewA");
+// With parameters
+NavigationService.Navigate("ViewA", new NavigateParameters
+{
+    { "id", 10 }
+});
+// ViewModel
+NavigationService.Navigate("ViewAViewModel");
+```
+
 Replace: example remove LoginView from navigation journal
 
 ```cs
@@ -217,9 +230,7 @@ public class ProtectedViewModel : BindableBase, ISupportNavigation, ISupportActi
 
 ### Registering views (and view models) for navigation
 
-#### ConfigurableNavigationService
-
-Easy to configure for navigation (do not require to use a bootstrapper)
+`ConfigurableNavigationService` is easy to configure (do not require to use a bootstrapper)
 
 ```cs
 var navigationService = new ConfigurableNavigationService
@@ -240,7 +251,9 @@ var navigationService = new ConfigurableNavigationService();
 navigationService.RegisterViewsInExactNamespaceOf<Shell>(); // or RegisterViewsInNamespaceOf
 ```
 
-#### NavigationService with a Bootstrapper
+`NavigationService`: it's better to use a Bootstrapper (to register views for navigation) ...
+
+## Bootstrapper
 
 Examples
 
@@ -368,31 +381,31 @@ public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivati
 {
     // etc.
 
-    public void CanActivate(NavigateContext navigationContext, Action<bool> continuationCallback)
+    public void CanActivate(NavigateContext context, Action<bool> continuationCallback)
     {
         var can = MessageBox.Show($"Activate {nameof(ViewAViewModel)}?", "Confirmation", MessageBoxButton.OKCancel) == MessageBoxResult.OK;
         continuationCallback(can);
     }
 
-    public void CanDeactivate(NavigateContext navigationContext, Action<bool> continuationCallback)
+    public void CanDeactivate(NavigateContext context, Action<bool> continuationCallback)
     {
         var can = MessageBox.Show($"Deactivate {nameof(ViewAViewModel)}?", "Confirmation", MessageBoxButton.OKCancel) == MessageBoxResult.OK;
         continuationCallback(can);
     }
 
     // returns always the same View/ViewModel if the pageKey of the uri is ViewA
-    public bool IsNavigationTarget(NavigateContext navigationContext) => navigationContext.PageKey == "ViewA";
+    public bool IsNavigationTarget(NavigateContext context) => context.PageKey == "ViewA";
 
-    public void OnNavigatedFrom(NavigateContext navigationContext)  { }
+    public void OnNavigatedFrom(NavigateContext context)  { }
 
-    public void OnNavigatedTo(NavigateContext navigationContext)
+    public void OnNavigatedTo(NavigateContext context)
     {
-        var id = navigationContext.Parameters.GetValue<string>("id");
+        var id = context.Parameters.GetValue<string>("id");
     }
 }
 ```
 
-### Easy to customize Navigation Service
+## Change the Mvvm interfaces used by the Navigation Service
 
 Example: replace to use Prism interfaces
 
@@ -1043,7 +1056,6 @@ TreeViewSelectedItemChangedBehavior
     </ml:Interaction.Behaviors>
 </TreeView>
 ```
-
 
 ## BindingProxy
 
