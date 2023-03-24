@@ -433,7 +433,7 @@ public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivati
 }
 ```
 
-### Handle Loaded form ViewModel
+### Handle Loaded from ViewModel
 
 Add the `EnabledLoaded` attached property on the View
 
