@@ -51,9 +51,7 @@
 
 <li class="tocentry"><a href="#controls">Controls</a></li>
 
-<li class="tocentry"><a href="#triggers-and-triggeractions">Triggers and TriggerActions</a></li>
-
-<li class="tocentry"><a href="#behaviors">Behaviors</a></li>
+<li class="tocentry"><a href="#interactivity">Interactivity</a></li>
 
 <li class="tocentry"><a href="#bindingproxy">BindingProxy</a></li>
 
@@ -1232,8 +1230,9 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 &lt;ml:NavigatableContentControl x:Name=&quot;NavigatableContentControl&quot;/&gt;
 </code></pre>
 
-<h2 id="triggers-and-triggeractions">Triggers and TriggerActions<a class="headerlink" href="#triggers-and-triggeractions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>Example:</p>
+<h2 id="interactivity">Interactivity<a class="headerlink" href="#interactivity" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<h3 id="triggers-and-triggeractions">Triggers and TriggerActions<a class="headerlink" href="#triggers-and-triggeractions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>EventTrigger</p>
 <pre><code class="xml">&lt;Button x:Name=&quot;Button1&quot; Content=&quot;Click!&quot;&gt;
     &lt;ml:Interaction.Triggers&gt;
         &lt;ml:EventTrigger EventName=&quot;Click&quot;&gt;
@@ -1245,7 +1244,7 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 &lt;/Button&gt;
 </code></pre>
 
-<p>DataTrigger sample</p>
+<p>DataTrigger</p>
 <pre><code class="xml">&lt;TextBlock x:Name=&quot;TextBlock1&quot; Text=&quot;{Binding MyValue}&quot;&gt;
     &lt;ml:Interaction.Triggers&gt;
         &lt;ml:DataTrigger Binding=&quot;{Binding MyValue}&quot; Value=&quot;My value&quot;&gt;
@@ -1270,38 +1269,8 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <li>ChangePropertyAction</li>
 <li>GoToStateAction</li>
 </ul>
-<p>Easy to create our owns Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).</p>
-<p>CallMethodAction</p>
-<pre><code class="xml">&lt;Button Content=&quot;Test&quot;&gt;
-    &lt;ml:Interaction.Triggers&gt;
-        &lt;ml:EventTrigger EventName=&quot;Click&quot;&gt;
-            &lt;ml:CallMethodAction TargetObject=&quot;{Binding}&quot; MethodName=&quot;MyMethod&quot; Parameter=&quot;MvvmLib!&quot;/&gt;
-        &lt;/ml:EventTrigger&gt;
-    &lt;/ml:Interaction.Triggers&gt;
-&lt;/Button&gt;
-</code></pre>
-
-<p>ChangePropertyAction</p>
-<pre><code class="xml">&lt;Button Content=&quot;Test&quot; HorizontalAlignment=&quot;Left&quot; Margin=&quot;5&quot;&gt;
-    &lt;ml:Interaction.Triggers&gt;
-        &lt;ml:EventTrigger EventName=&quot;Click&quot;&gt;
-            &lt;ml:InvokeCommandAction Command=&quot;{Binding MessageCommand}&quot; CommandParameter=&quot;Marie!&quot;/&gt;
-        &lt;/ml:EventTrigger&gt;
-    &lt;/ml:Interaction.Triggers&gt;
-&lt;/Button&gt;
-</code></pre>
-
-<p>InvokeCommandAction</p>
-<pre><code class="xml">&lt;Button Content=&quot;Test&quot; HorizontalAlignment=&quot;Left&quot; Margin=&quot;5&quot;&gt;
-    &lt;ml:Interaction.Triggers&gt;
-        &lt;ml:EventTrigger EventName=&quot;Click&quot;&gt;
-            &lt;ml:ChangePropertyAction TargetObject=&quot;{Binding}&quot; PropertyPath=&quot;MyProperty&quot; Value=&quot;New Value!&quot;/&gt;
-        &lt;/ml:EventTrigger&gt;
-    &lt;/ml:Interaction.Triggers&gt;
-&lt;/Button&gt;
-</code></pre>
-
-<h2 id="behaviors">Behaviors<a class="headerlink" href="#behaviors" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>It's possible to create custom Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).</p>
+<h3 id="behaviors">Behaviors<a class="headerlink" href="#behaviors" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>EventToCommandBehavior</p>
 <pre><code class="xml">&lt;Button Content=&quot;Click event&quot;&gt;
     &lt;ml:NavigationInteraction.Behaviors&gt;
@@ -1343,7 +1312,6 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
                 &lt;TextBlock Text=&quot; (&quot; Foreground=&quot;Green&quot; /&gt;
                 &lt;TextBlock Text=&quot;{Binding Age}&quot; Foreground=&quot;Green&quot; /&gt;
                 &lt;TextBlock Text=&quot; years)&quot; Foreground=&quot;Green&quot; /&gt;
-                &lt;CheckBox IsChecked=&quot;{Binding IsActive}&quot; /&gt;
             &lt;/StackPanel&gt;
         &lt;/DataTemplate&gt;
     &lt;/TreeView.Resources&gt;

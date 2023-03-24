@@ -1172,9 +1172,11 @@ Example 2 xaml
 <ml:NavigatableContentControl x:Name="NavigatableContentControl"/>
 ```
 
-## Triggers and TriggerActions
+## Interactivity
 
-Example:
+### Triggers and TriggerActions
+
+EventTrigger
 
 ```xml
 <Button x:Name="Button1" Content="Click!">
@@ -1188,7 +1190,7 @@ Example:
 </Button>
 ```
 
-DataTrigger sample
+DataTrigger
 
 ```xml
 <TextBlock x:Name="TextBlock1" Text="{Binding MyValue}">
@@ -1215,45 +1217,9 @@ TriggerActions:
 * ChangePropertyAction
 * GoToStateAction
 
-Easy to create our owns Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).
+It's possible to create custom Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).
 
-CallMethodAction
-
-```xml
-<Button Content="Test">
-    <ml:Interaction.Triggers>
-        <ml:EventTrigger EventName="Click">
-            <ml:CallMethodAction TargetObject="{Binding}" MethodName="MyMethod" Parameter="MvvmLib!"/>
-        </ml:EventTrigger>
-    </ml:Interaction.Triggers>
-</Button>
-```
-
-ChangePropertyAction
-
-```xml
-<Button Content="Test" HorizontalAlignment="Left" Margin="5">
-    <ml:Interaction.Triggers>
-        <ml:EventTrigger EventName="Click">
-            <ml:InvokeCommandAction Command="{Binding MessageCommand}" CommandParameter="Marie!"/>
-        </ml:EventTrigger>
-    </ml:Interaction.Triggers>
-</Button>
-```
-
-InvokeCommandAction
-
-```xml
-<Button Content="Test" HorizontalAlignment="Left" Margin="5">
-    <ml:Interaction.Triggers>
-        <ml:EventTrigger EventName="Click">
-            <ml:ChangePropertyAction TargetObject="{Binding}" PropertyPath="MyProperty" Value="New Value!"/>
-        </ml:EventTrigger>
-    </ml:Interaction.Triggers>
-</Button>
-```
-
-## Behaviors
+### Behaviors
 
 EventToCommandBehavior
 
@@ -1303,7 +1269,6 @@ TreeViewSelectedItemChangedBehavior
                 <TextBlock Text=" (" Foreground="Green" />
                 <TextBlock Text="{Binding Age}" Foreground="Green" />
                 <TextBlock Text=" years)" Foreground="Green" />
-                <CheckBox IsChecked="{Binding IsActive}" />
             </StackPanel>
         </DataTemplate>
     </TreeView.Resources>
