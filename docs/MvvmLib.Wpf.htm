@@ -468,6 +468,28 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
 }
 </code></pre>
 
+<p>App.xaml: Replace StartupUri by Startup event</p>
+<pre><code class="xml">&lt;Application x:Class=&quot;WpfApp1.App&quot;
+             xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+             xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+             xmlns:local=&quot;clr-namespace:WpfApp1&quot;
+             Startup=&quot;Application_Startup&quot;&gt;
+    &lt;Application.Resources&gt;
+         
+    &lt;/Application.Resources&gt;
+&lt;/Application&gt;
+</code></pre>
+
+<p>In code behind</p>
+<pre><code class="cs">public partial class App : Application
+{
+    private void Application_Startup(object sender, StartupEventArgs e)
+    {
+        new Bootstrapper().Run();
+    }
+}
+</code></pre>
+
 <h3 id="mvvm-support">Mvvm Support<a class="headerlink" href="#mvvm-support" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>Navigation</p>
 <ul>

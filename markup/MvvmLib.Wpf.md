@@ -350,6 +350,32 @@ public class Bootstrapper : InjectorBootstrapperBase
 }
 ```
 
+App.xaml: Replace StartupUri by Startup event
+
+```xml
+<Application x:Class="WpfApp1.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WpfApp1"
+             Startup="Application_Startup">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
+```
+
+In code behind
+
+```cs
+public partial class App : Application
+{
+    private void Application_Startup(object sender, StartupEventArgs e)
+    {
+        new Bootstrapper().Run();
+    }
+}
+```
+
 ### Mvvm Support
 
 Navigation
