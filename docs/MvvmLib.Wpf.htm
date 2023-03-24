@@ -47,6 +47,8 @@
 
 <li class="tocentry"><a href="#create-a-custom-navigation-service">Create a custom Navigation Service</a></li>
 
+<li class="tocentry"><a href="#data">Data</a></li>
+
 <li class="tocentry"><a href="#controls">Controls</a></li>
 
 <li class="tocentry"><a href="#triggers-and-triggeractions">Triggers and TriggerActions</a></li>
@@ -282,8 +284,13 @@ View model name:
 
 <p>In code</p>
 <pre><code class="cs">NavigationService.Navigate(&quot;ViewA&quot;);
-// With parameters
+// With parameters 
 NavigationService.Navigate(&quot;ViewA&quot;, new NavigateParameters
+{
+    { &quot;id&quot;, 10 }
+});
+// note: the query parameters are added to the NavigateParameters
+NavigationService.Navigate(&quot;ViewA?tag=sample&quot;, new NavigateParameters
 {
     { &quot;id&quot;, 10 }
 });
@@ -523,7 +530,7 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
         continuationCallback(can);
     }
 
-    // returns always the same View/ViewModel if the pageKey of the uri is ViewA
+    // returns always the same View/ViewModel if the pageKey of the uri is View (Usefull for Master Details Scenario for example)
     public bool IsNavigationTarget(NavigateContext context) =&gt; context.PageKey == &quot;ViewA&quot;;
 
     public void OnNavigatedFrom(NavigateContext context)  { }
@@ -531,6 +538,24 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
     public void OnNavigatedTo(NavigateContext context)
     {
         var id = context.Parameters.GetValue&lt;string&gt;(&quot;id&quot;);
+    }
+}
+</code></pre>
+
+<h3 id="handle-loaded-form-viewmodel">Handle Loaded form ViewModel<a class="headerlink" href="#handle-loaded-form-viewmodel" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Add the <code>EnabledLoaded</code> attached property on the View</p>
+<pre><code class="xml">&lt;Window
+        ...
+        xmlns:ml=&quot;http://mvvmlib.com/&quot;
+        ml:ViewModel.EnableLoaded=&quot;True&quot; /&gt;
+</code></pre>
+
+<p>Implement <code>ISupportLoaded</code></p>
+<pre><code class="cs">public class ShellViewModel : ISupportLoaded
+{
+    public void OnLoaded()
+    {
+        // do something
     }
 }
 </code></pre>
@@ -820,6 +845,204 @@ public class CustomJournal : NavigationJournal
 }
 </code></pre>
 
+<h2 id="data">Data<a class="headerlink" href="#data" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<h3 id="listcollectionviewex">ListCollectionViewEx<a class="headerlink" href="#listcollectionviewex" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Is a ListCollectionView with shortcuts and usefull methods</p>
+<pre><code class="cs">public class ListCollectionViewSampleViewModel
+{
+    public ListCollectionViewSampleViewModel()
+    {
+        var users = new List&lt;User&gt;
+        {
+            new User { Id = 1, FirstName = &quot;First.1&quot;, LastName =&quot;Last.1&quot;, Age = 30, Role = UserRole.Admin },
+            new User { Id = 2, FirstName = &quot;First.2&quot;, LastName =&quot;Last.2&quot;, Age = 40, Role = UserRole.User },
+            new User { Id = 3, FirstName = &quot;First.3&quot;, LastName =&quot;Last.3&quot;, Age = 50, Role = UserRole.SuperAdmin },
+            // ...
+        };
+        View = new ListCollectionViewEx&lt;User&gt;(users);
+
+        Commands = new ListCollectionViewCommands(View)
+        {
+            Delete = Delete,
+            Save = Save,
+            Sort = new Action&lt;string, ListSortDirection&gt;((p, d) =&gt; View.Sort(p, d)),
+            Filter = Filter
+        };
+    }
+
+    public ListCollectionViewEx&lt;User&gt; View { get; }
+    public ListCollectionViewCommands Commands { get; }
+
+    private void Filter(string args)
+    {
+        if (string.IsNullOrWhiteSpace(args))
+            View.ClearFilter();
+        else
+        {
+            var splits = SplitText(args);
+            if (splits.Length &gt; 0)
+            {
+                var compositeFilter = new CompositeFilter&lt;User&gt;(LogicalOperator.Or);
+                foreach (var split in splits)
+                {
+                    compositeFilter.AddFilter(new PropertyFilter&lt;User&gt;(&quot;FirstName&quot;, PredicateOperator.Contains, split));
+                    compositeFilter.AddFilter(new PropertyFilter&lt;User&gt;(&quot;LastName&quot;, PredicateOperator.Contains, split));
+                }
+                View.Filter = compositeFilter.Filter;
+            }
+        }
+    }
+
+    private string[] SplitText(string text) =&gt; text.Split(' ', ',');
+
+    private void Save()
+    {
+        try
+        {
+            if (View.IsAddingNew)
+            {
+                var current = View.CurrentAddItem as User;
+                current.ValidateAll();
+                if (!current.HasErrors)
+                {
+                    // save to db...
+                    View.CommitNew();
+                }
+            }
+            else if (View.IsEditingItem)
+            {
+                var current = View.CurrentEditItem as User;
+                current.ValidateAll();
+                if (!current.HasErrors)
+                {
+                    // save to db ..
+                    View.CommitEdit();
+                }
+            }
+        }
+        catch (Exception ex)
+        { }
+    }
+
+    private void Delete()
+    {
+        var current = View.Current;
+        if (MessageBox.Show($&quot;Delete {current.FirstName}?&quot;, &quot;Confirmation&quot;, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+        {
+            try
+            {
+                // remove from db ...
+                View.Remove(current);
+                // eventAggregator.GetEvent&lt;NotificationMessageEvent&gt;().Publish($&quot;{name} removed!&quot;);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($&quot;A problem occured:{ex.Message}&quot;);
+            }
+        }
+    }
+}
+
+public class User : Validatable, IEditableObject
+{
+    private User oldUser = null;
+
+    public void BeginEdit()
+    {
+        oldUser = new User
+        {
+            Id = Id,
+            FirstName = FirstName,
+            LastName = LastName,
+            ImagePath = ImagePath,
+            Age = Age,
+            Role = Role
+        };
+    }
+
+    public void CancelEdit()
+    {
+        if (oldUser == null)
+            throw new InvalidOperationException();
+
+        FirstName = oldUser.FirstName;
+        LastName = oldUser.LastName;
+        ImagePath = oldUser.ImagePath;
+        Age = oldUser.age;
+        Role = oldUser.role;
+    }
+
+    public void EndEdit()
+    {
+        oldUser = null;
+    }
+
+    private string firstName;
+    [Required]
+    public string FirstName
+    {
+        get { return firstName; }
+        set { SetProperty(ref firstName, value); }
+    }
+
+    // etc.
+}
+</code></pre>
+
+<h3 id="pagedlist-ilist-extensions">PagedList (IList extensions)<a class="headerlink" href="#pagedlist-ilist-extensions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<pre><code class="cs">int pageNumber = 1;
+int pageSize = 50;
+var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
+</code></pre>
+
+<h3 id="pagedsource">PagedSource<a class="headerlink" href="#pagedsource" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<pre><code class="cs">public class PagedSourceViewModel : BindableBase
+{
+    public PagedSourceViewModel()
+    {
+        Users = new ObservableCollection&lt;User&gt;();
+        PopulateUsers();
+        PagedSource = new PagedSource(Users);
+        Commands = new PagedSourceCommands(PagedSource);
+
+        AddNewItemCommand = new DelegateCommand(AddItem);
+    }
+
+    public ObservableCollection&lt;User&gt; Users { get; }
+    public PagedSource PagedSource { get; }
+    public PagedSourceCommands Commands { get; }
+    public ICommand AddNewItemCommand { get; }
+
+    private void AddItem()
+    {
+        var user = new User();
+        PagedSource.View.AddNewItem(user);
+        PagedSource.MoveToLastPage();
+        PagedSource.PageView.MoveCurrentToLast();
+    }
+
+    // etc.
+}
+</code></pre>
+
+<p>Binding</p>
+<pre><code class="xml">&lt;!-- commands --&gt;
+&lt;Button Command=&quot;{Binding Commands.MoveCurrentToFirstCommand}&quot; &gt;
+    &lt;controls:MaterialDesignIcon Icon=&quot;SkipPrevious&quot; Brush=&quot;#2980b9&quot;/&gt;
+&lt;/Button&gt;
+
+&lt;!-- currentItem --&gt;
+&lt;ContentControl Content=&quot;{Binding PagedSource.PageView.CurrentItem, Mode=OneWay}&quot;&gt;&lt;/ContentControl&gt;
+</code></pre>
+
+<p>It's possible to create a <code>DataPager</code> and the methods of the PagedSource</p>
+<ul>
+<li>MoveToFirstPage</li>
+<li>MoveToPreviousPage</li>
+<li>MoveToNextPage</li>
+<li>MoveToLastPage</li>
+<li>MoveToPage</li>
+</ul>
 <h2 id="controls">Controls<a class="headerlink" href="#controls" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <h3 id="animatingcontentcontrol">AnimatingContentControl<a class="headerlink" href="#animatingcontentcontrol" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <blockquote>

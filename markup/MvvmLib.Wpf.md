@@ -138,8 +138,13 @@ In code
 
 ```cs
 NavigationService.Navigate("ViewA");
-// With parameters
+// With parameters 
 NavigationService.Navigate("ViewA", new NavigateParameters
+{
+    { "id", 10 }
+});
+// note: the query parameters are added to the NavigateParameters
+NavigationService.Navigate("ViewA?tag=sample", new NavigateParameters
 {
     { "id", 10 }
 });
@@ -416,7 +421,7 @@ public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivati
         continuationCallback(can);
     }
 
-    // returns always the same View/ViewModel if the pageKey of the uri is ViewA
+    // returns always the same View/ViewModel if the pageKey of the uri is View (Usefull for Master Details Scenario for example)
     public bool IsNavigationTarget(NavigateContext context) => context.PageKey == "ViewA";
 
     public void OnNavigatedFrom(NavigateContext context)  { }
@@ -427,6 +432,30 @@ public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivati
     }
 }
 ```
+
+### Handle Loaded form ViewModel
+
+Add the `EnabledLoaded` attached property on the View
+
+```xml
+<Window
+        ...
+        xmlns:ml="http://mvvmlib.com/"
+        ml:ViewModel.EnableLoaded="True" />
+```
+
+Implement `ISupportLoaded`
+
+```cs
+public class ShellViewModel : ISupportLoaded
+{
+    public void OnLoaded()
+    {
+        // do something
+    }
+}
+```
+
 
 ## Change the Mvvm interfaces used by the Navigation Service
 
@@ -723,8 +752,216 @@ public partial class MainWindow : Window
 }
 ```
 
-## Controls
+## Data
 
+### ListCollectionViewEx
+
+Is a ListCollectionView with shortcuts and usefull methods
+
+```cs
+public class ListCollectionViewSampleViewModel
+{
+    public ListCollectionViewSampleViewModel()
+    {
+        var users = new List<User>
+        {
+            new User { Id = 1, FirstName = "First.1", LastName ="Last.1", Age = 30, Role = UserRole.Admin },
+            new User { Id = 2, FirstName = "First.2", LastName ="Last.2", Age = 40, Role = UserRole.User },
+            new User { Id = 3, FirstName = "First.3", LastName ="Last.3", Age = 50, Role = UserRole.SuperAdmin },
+            // ...
+        };
+        View = new ListCollectionViewEx<User>(users);
+
+        Commands = new ListCollectionViewCommands(View)
+        {
+            Delete = Delete,
+            Save = Save,
+            Sort = new Action<string, ListSortDirection>((p, d) => View.Sort(p, d)),
+            Filter = Filter
+        };
+    }
+
+    public ListCollectionViewEx<User> View { get; }
+    public ListCollectionViewCommands Commands { get; }
+
+    private void Filter(string args)
+    {
+        if (string.IsNullOrWhiteSpace(args))
+            View.ClearFilter();
+        else
+        {
+            var splits = SplitText(args);
+            if (splits.Length > 0)
+            {
+                var compositeFilter = new CompositeFilter<User>(LogicalOperator.Or);
+                foreach (var split in splits)
+                {
+                    compositeFilter.AddFilter(new PropertyFilter<User>("FirstName", PredicateOperator.Contains, split));
+                    compositeFilter.AddFilter(new PropertyFilter<User>("LastName", PredicateOperator.Contains, split));
+                }
+                View.Filter = compositeFilter.Filter;
+            }
+        }
+    }
+
+    private string[] SplitText(string text) => text.Split(' ', ',');
+
+    private void Save()
+    {
+        try
+        {
+            if (View.IsAddingNew)
+            {
+                var current = View.CurrentAddItem as User;
+                current.ValidateAll();
+                if (!current.HasErrors)
+                {
+                    // save to db...
+                    View.CommitNew();
+                }
+            }
+            else if (View.IsEditingItem)
+            {
+                var current = View.CurrentEditItem as User;
+                current.ValidateAll();
+                if (!current.HasErrors)
+                {
+                    // save to db ..
+                    View.CommitEdit();
+                }
+            }
+        }
+        catch (Exception ex)
+        { }
+    }
+
+    private void Delete()
+    {
+        var current = View.Current;
+        if (MessageBox.Show($"Delete {current.FirstName}?", "Confirmation", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+        {
+            try
+            {
+                // remove from db ...
+                View.Remove(current);
+                // eventAggregator.GetEvent<NotificationMessageEvent>().Publish($"{name} removed!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"A problem occured:{ex.Message}");
+            }
+        }
+    }
+}
+
+public class User : Validatable, IEditableObject
+{
+    private User oldUser = null;
+
+    public void BeginEdit()
+    {
+        oldUser = new User
+        {
+            Id = Id,
+            FirstName = FirstName,
+            LastName = LastName,
+            ImagePath = ImagePath,
+            Age = Age,
+            Role = Role
+        };
+    }
+
+    public void CancelEdit()
+    {
+        if (oldUser == null)
+            throw new InvalidOperationException();
+
+        FirstName = oldUser.FirstName;
+        LastName = oldUser.LastName;
+        ImagePath = oldUser.ImagePath;
+        Age = oldUser.age;
+        Role = oldUser.role;
+    }
+
+    public void EndEdit()
+    {
+        oldUser = null;
+    }
+
+    private string firstName;
+    [Required]
+    public string FirstName
+    {
+        get { return firstName; }
+        set { SetProperty(ref firstName, value); }
+    }
+
+    // etc.
+}
+```
+
+### PagedList (IList extensions)
+
+```cs
+int pageNumber = 1;
+int pageSize = 50;
+var pagedList = Users.ToPagedList<User>(pageNumber, pageSize);
+```
+
+### PagedSource
+
+
+```cs
+public class PagedSourceViewModel : BindableBase
+{
+    public PagedSourceViewModel()
+    {
+        Users = new ObservableCollection<User>();
+        PopulateUsers();
+        PagedSource = new PagedSource(Users);
+        Commands = new PagedSourceCommands(PagedSource);
+
+        AddNewItemCommand = new DelegateCommand(AddItem);
+    }
+
+    public ObservableCollection<User> Users { get; }
+    public PagedSource PagedSource { get; }
+    public PagedSourceCommands Commands { get; }
+    public ICommand AddNewItemCommand { get; }
+
+    private void AddItem()
+    {
+        var user = new User();
+        PagedSource.View.AddNewItem(user);
+        PagedSource.MoveToLastPage();
+        PagedSource.PageView.MoveCurrentToLast();
+    }
+
+    // etc.
+}
+```
+
+Binding
+
+```xml
+<!-- commands -->
+<Button Command="{Binding Commands.MoveCurrentToFirstCommand}" >
+    <controls:MaterialDesignIcon Icon="SkipPrevious" Brush="#2980b9"/>
+</Button>
+
+<!-- currentItem -->
+<ContentControl Content="{Binding PagedSource.PageView.CurrentItem, Mode=OneWay}"></ContentControl>
+```
+
+It's possible to create a `DataPager` and the methods of the PagedSource
+
+* MoveToFirstPage
+* MoveToPreviousPage
+* MoveToNextPage
+* MoveToLastPage
+* MoveToPage
+
+## Controls
 
 ### AnimatingContentControl
 
