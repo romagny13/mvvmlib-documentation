@@ -546,20 +546,12 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
 
     protected override void CanNavigate(object currentContent, object content, NavigateContext context, Action&lt;bool&gt; continuationCallback)
     {
-        var callback = new Action&lt;bool&gt;(t =&gt;
-        {
-            if (t == false)
-                continuationCallback(false);
-            else
-                continuationCallback(t);
-        });
-
         if (currentContent is IConfirmNavigationRequest)
-            ((IConfirmNavigationRequest)currentContent).ConfirmNavigationRequest(context.AsPrism(), callback);
+            ((IConfirmNavigationRequest)currentContent).ConfirmNavigationRequest(context.AsPrism(), continuationCallback);
         else if (currentContent is FrameworkElement element &amp;&amp; element.DataContext is IConfirmNavigationRequest)
-            ((IConfirmNavigationRequest)element.DataContext).ConfirmNavigationRequest(context.AsPrism(), callback);
+            ((IConfirmNavigationRequest)element.DataContext).ConfirmNavigationRequest(context.AsPrism(), continuationCallback);
         else
-            callback(true);
+            continuationCallback(true);
     }
 
     protected override bool PersistInJournal(object content)

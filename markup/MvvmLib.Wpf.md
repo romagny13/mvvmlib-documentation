@@ -438,20 +438,12 @@ public class PrismNavigationService : NavigationService
 
     protected override void CanNavigate(object currentContent, object content, NavigateContext context, Action<bool> continuationCallback)
     {
-        var callback = new Action<bool>(t =>
-        {
-            if (t == false)
-                continuationCallback(false);
-            else
-                continuationCallback(t);
-        });
-
         if (currentContent is IConfirmNavigationRequest)
-            ((IConfirmNavigationRequest)currentContent).ConfirmNavigationRequest(context.AsPrism(), callback);
+            ((IConfirmNavigationRequest)currentContent).ConfirmNavigationRequest(context.AsPrism(), continuationCallback);
         else if (currentContent is FrameworkElement element && element.DataContext is IConfirmNavigationRequest)
-            ((IConfirmNavigationRequest)element.DataContext).ConfirmNavigationRequest(context.AsPrism(), callback);
+            ((IConfirmNavigationRequest)element.DataContext).ConfirmNavigationRequest(context.AsPrism(), continuationCallback);
         else
-            callback(true);
+            continuationCallback(true);
     }
 
     protected override bool PersistInJournal(object content)
