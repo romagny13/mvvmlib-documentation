@@ -3,7 +3,7 @@
 * Mvvm: **ViewModelLocator**, **BindingProxy**, etc.
 * Navigation: **NavigationService**, **ConfigurableNavigationService**
 * Data: **ListCollectionViewEx**, **PagedList**, **PagedSource** and commands **ListCollectionViewCommands**, **PagedSourceCommands**
-* Interactivity: **CallMethodeAction**, **SelectorSelectedItemsSyncBehavior**, **EventToCommandBehavior**,**EventToMethodBehavior**, etc.
+* Interactivity: **CallMethodAction**, **SelectorSelectedItemsSyncBehavior**, **EventToCommandBehavior**, etc.
 * Controls: **AnimatingContentControl**, **TransitioningContentControl**, **TransitioningItemsControl**: allow to animate content. **NavigatableContentControl**
 * Expressions: allows to create filters with Linq expressions.
 * Common: **MvvmUtils**
