@@ -3,7 +3,7 @@
 * Mvvm: **ViewModelLocator**, **BindingProxy**, etc.
 * Navigation: **NavigationService**, **ConfigurableNavigationService**
 * Data: **ListCollectionViewEx**, **PagedList**, **PagedSource** and commands **ListCollectionViewCommands**, **PagedSourceCommands**
-* Interactivity: **Triggers**, **TriggerActions** and **Behaviors**: **EventTrigger**, **DataTrigger**, **CallMethodeAction**, **SelectorSelectedItemsSyncBehavior**, **EventToCommandBehavior**,**EventToMethodBehavior**, etc.
+* Interactivity: **CallMethodeAction**, **SelectorSelectedItemsSyncBehavior**, **EventToCommandBehavior**,**EventToMethodBehavior**, etc.
 * Controls: **AnimatingContentControl**, **TransitioningContentControl**, **TransitioningItemsControl**: allow to animate content. **NavigatableContentControl**
 * Expressions: allows to create filters with Linq expressions.
 * Common: **MvvmUtils**
@@ -697,5 +697,354 @@ public partial class MainWindow : Window
         navigationService.Attach(new SyncStackPanelBehavior(Panel));
     }
 }
+```
+
+## Controls
+
+
+### AnimatingContentControl
+
+> Content Control that allows to animate on content change. 
+
+2 Storyboards : 
+
+* EntranceAnimation 
+* ExitAnimation
+* Simultaneous (boolean) allows to play simultaneously the animations.
+* CanAnimateOnLoad: allows to cancel animation on load
+
+```xml
+<mvvmLib:AnimatingContentControl mvvmLib:NavigationManager.SourceName="Main">
+    <mvvmLib:AnimatingContentControl.EntranceAnimation>
+        <Storyboard>
+            <!-- Target "CurrentContentPresenter"  -->
+            <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
+                             From="400" To="0" Duration="0:0:0.4"  />
+        </Storyboard>
+    </mvvmLib:AnimatingContentControl.EntranceAnimation>
+    <mvvmLib:AnimatingContentControl.ExitAnimation>
+        <Storyboard>
+            <!-- Target "CurrentContentPresenter" or with Simultaneous "PreviousContentPresenter" -->
+            <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
+                             From="0" To="400" Duration="0:0:0.4"  />
+        </Storyboard>
+    </mvvmLib:AnimatingContentControl.ExitAnimation>
+</mvvmLib:AnimatingContentControl>
+```
+
+Or Simultaneous
+
+```xml
+  <mvvmLib:AnimatingContentControl Content="{Binding Navigation.Current}" 
+                                    Simultaneous="True"
+                                    IsCancelled="{Binding IsCancelled}">
+    <mvvmLib:AnimatingContentControl.EntranceAnimation>
+        <Storyboard>
+            <DoubleAnimation  Storyboard.TargetName="CurrentContentPresenter"
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
+                                From="{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}" To="0" 
+                                Duration="{Binding ElementName=DuractionComboBox,Path=SelectedItem}">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </mvvmLib:AnimatingContentControl.EntranceAnimation>
+    <mvvmLib:AnimatingContentControl.ExitAnimation>
+        <Storyboard>
+            <DoubleAnimation  Storyboard.TargetName="PreviousContentPresenter"
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
+                                From="0" To="{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}" 
+                                Duration="{Binding ElementName=DuractionComboBox,Path=SelectedItem}">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </mvvmLib:AnimatingContentControl.ExitAnimation>
+</mvvmLib:AnimatingContentControl>
+```
+
+Other sample: animations in resources
+
+
+```xml
+<UserControl.Resources>
+    <Storyboard x:Key="EntranceAnimation1">
+        <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
+                         Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
+                         From="400" To="0" Duration="0:0:0.4"  />
+    </Storyboard>
+
+    <Storyboard x:Key="ExitAnimation1">
+        <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
+                         Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
+                         From="0" To="-400" Duration="0:0:0.4"  />
+    </Storyboard>
+</UserControl.Resources>
+```
+
+```xml
+<mvvmLib:AnimatingContentControl Content="{Binding Navigation.Current}" 
+                                 EntranceAnimation="{StaticResource EntranceAnimation1}"
+                                 ExitAnimation="{StaticResource ExitAnimation1}">
+</mvvmLib:AnimatingContentControl>
+```
+
+Other sample: Change Animations dynamically and controlling when the animation is played with "CanAnimate". For a Schedule view for example.
+
+```xml
+<mvvmLib:AnimatingContentControl  Content="{Binding Navigation.Current}" 
+                                  CanAnimate="{Binding CanAnimate, Mode=OneWay}" 
+                                  CanAnimateOnLoad="False"
+                                  EntranceAnimation="{Binding EntranceAnimation, Mode=OneWay}"
+                                  ExitAnimation="{Binding ExitAnimation, Mode=OneWay}">
+
+    <mvvmLib:Interaction.Triggers>
+        <mvvmLib:EventTrigger EventName="AnimationCompleted">
+            <mvvmLib:CallMethodAction TargetObject="{Binding}" MethodName="CompleteChangingScheduleMode"/>
+        </mvvmLib:EventTrigger>
+    </mvvmLib:Interaction.Triggers>
+
+</mvvmLib:AnimatingContentControl>
+```
+
+
+### TransitioningContentControl
+
+> Allows to play a transition on loaded.
+
+2 Storyboards:
+
+* EntranceTransition: played when control loaded (or explicitly with "DoEnter")
+* ExitTransition: played explicitly with "DoLeave" or IsLeaving dependency property (for example played when the user click on a tab close button)
+
+Other methods:
+
+* CancelTransition
+* Reset: reset the render transform property and opacity + cancel transition
+
+```xml
+<mvvmLib:TransitioningContentControl x:Name="TransitioningContentControl1" Margin="0,20">
+        <mvvmLib:TransitioningContentControl.EntranceTransition>
+            <Storyboard>
+                <DoubleAnimation Storyboard.TargetName="ContentPresenter" 
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" 
+                                    From="0" To="1" Duration="0:0:0.6">
+                    <DoubleAnimation.EasingFunction>
+                        <ExponentialEase EasingMode="EaseInOut"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+            </Storyboard>
+        </mvvmLib:TransitioningContentControl.EntranceTransition>
+        <mvvmLib:TransitioningContentControl.ExitTransition>
+            <Storyboard>
+                <DoubleAnimation Storyboard.TargetName="ContentPresenter" 
+                                    Storyboard.TargetProperty="(UIElement.Opacity)" 
+                                    From="1" To="0" Duration="0:0:2"/>
+            </Storyboard>
+</mvvmLib:TransitioningContentControl.ExitTransition>
+```
+
+### TransitioningItemsControl
+
+> ItemsControl that allows to animate on item insertion and deletion. 
+
+The "ControlledAnimation" avoid to set the target and the target property of the storyboard. The TargetPropertyType is a shortcut. But it's possible to target explicitly the target property of the storyboard with "TargetProperty" dependency property.
+
+```xml
+<mvvmLib:TransitioningItemsControl ItemsSource="{Binding MyItems}" 
+                                   TransitionClearHandling="Transition"
+                                   IsCancelled="{Binding IsCancelled}">
+    <mvvmLib:TransitioningItemsControl.EntranceAnimation>
+        <mvvmLib:ParallelAnimation>
+
+            <mvvmLib:ControlledAnimation TargetPropertyType="TranslateX">
+                <DoubleAnimation From="200" To="0"  Duration="0:0:2"/>
+            </mvvmLib:ControlledAnimation>
+
+        </mvvmLib:ParallelAnimation>
+    </mvvmLib:TransitioningItemsControl.EntranceAnimation>
+
+    <mvvmLib:TransitioningItemsControl.ExitAnimation>
+        <mvvmLib:ParallelAnimation>
+            <mvvmLib:ControlledAnimation TargetPropertyType="TranslateX">
+                <DoubleAnimation From="0" To="200" Duration="0:0:2"/>
+            </mvvmLib:ControlledAnimation>
+        </mvvmLib:ParallelAnimation>
+    </mvvmLib:TransitioningItemsControl.ExitAnimation>
+</mvvmLib:TransitioningItemsControl>
+```
+
+### NavigatableContentControl
+
+It's a control that allows to use navigation service méthods (like a Frame). 
+
+Example with mahApps.Metro, sets the content of the <a href="https://mahapps.com/docs/controls/HamburgerMenu" target="_blank">HamburgerMenu</a>
+
+```cs
+public partial class Shell
+{
+    public Shell(IConfigurableNavigationService navigationService)
+    {
+        InitializeComponent();
+
+        var navigatableContentControl = new NavigatableContentControl();
+        navigatableContentControl.NavigationService = navigationService;
+        HamburgerMenuControl.Content = navigatableContentControl;
+    }
+}
+```
+
+Example 2 xaml
+
+```xml
+<!-- xmlns:ml="http://mvvmlib.com/" -->
+<ml:NavigatableContentControl x:Name="NavigatableContentControl"/>
+```
+
+## Triggers and TriggerActions
+
+Example:
+
+```xml
+<Button x:Name="Button1" Content="Click!">
+    <mvvmLib:Interaction.Triggers>
+        <mvvmLib:EventTrigger EventName="Click">
+            <mvvmLib:CallMethodAction TargetObject="{Binding}" MethodName="SayHello" Parameter="My parameter" />
+            <mvvmLib:InvokeCommandAction Command="{Binding MyCommand}" CommandParameter="My parameter"/>
+            <mvvmLib:ChangePropertyAction TargetObject="{Binding ElementName=Button1}" PropertyPath="Foreground" Value="Red"/>
+        </mvvmLib:EventTrigger>
+    </mvvmLib:Interaction.Triggers>
+</Button>
+```
+
+DataTrigger sample
+
+```xml
+<TextBlock x:Name="TextBlock1" Text="{Binding MyValue}">
+    <mvvmLib:Interaction.Triggers>
+        <mvvmLib:DataTrigger Binding="{Binding MyValue}" Value="My value">
+            <mvvmLib:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock1}" PropertyPath="Foreground" Value="Red"/>
+        </mvvmLib:DataTrigger>
+        <mvvmLib:DataTrigger Binding="{Binding MyValue}" Comparison="NotEqual" Value="My value">
+            <mvvmLib:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock1}" PropertyPath="Foreground" Value="Blue"/>
+        </mvvmLib:DataTrigger>
+    </mvvmLib:Interaction.Triggers>
+</TextBlock>
+```
+
+Triggers:
+
+* EventTrigger
+* DataTrigger
+
+TriggerActions:
+
+* CallMethodAction
+* InvokeCommandAction
+* ChangePropertyAction
+* GoToStateAction
+
+Easy to create our owns Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).
+
+CallMethodAction
+
+```xml
+<Button Content="Test">
+    <ml:Interaction.Triggers>
+        <ml:EventTrigger EventName="Click">
+            <ml:CallMethodAction TargetObject="{Binding}" MethodName="MyMethod" Parameter="MvvmLib!"/>
+        </ml:EventTrigger>
+    </ml:Interaction.Triggers>
+</Button>
+```
+
+ChangePropertyAction
+
+```xml
+<Button Content="Test" HorizontalAlignment="Left" Margin="5">
+    <ml:Interaction.Triggers>
+        <ml:EventTrigger EventName="Click">
+            <ml:InvokeCommandAction Command="{Binding MessageCommand}" CommandParameter="Marie!"/>
+        </ml:EventTrigger>
+    </ml:Interaction.Triggers>
+</Button>
+```
+
+InvokeCommandAction
+
+```xml
+<Button Content="Test" HorizontalAlignment="Left" Margin="5">
+    <ml:Interaction.Triggers>
+        <ml:EventTrigger EventName="Click">
+            <ml:ChangePropertyAction TargetObject="{Binding}" PropertyPath="MyProperty" Value="New Value!"/>
+        </ml:EventTrigger>
+    </ml:Interaction.Triggers>
+</Button>
+```
+
+## Behaviors
+
+EventToCommandBehavior
+
+```xml
+<Button Content="Click event">
+    <mvvmLib:NavigationInteraction.Behaviors>
+        <mvvmLib:EventToCommandBehavior EventName="Click" Command="{Binding MessageCommand}" CommandParameter="World"/>
+    </mvvmLib:NavigationInteraction.Behaviors>
+</Button>
+```
+
+SelectorSelectedItemsSyncBehavior
+
+
+```xml
+<ListBox ItemsSource="{Binding Users}" 
+            SelectionMode="Multiple"
+            SelectedItem="{Binding SelectedUser}"
+            MinHeight="100">
+    <ml:Interaction.Behaviors>
+        <ml:SelectorSelectedItemsSyncBehavior ActiveItems="{Binding SelectedUsers}"/>
+    </ml:Interaction.Behaviors>
+    <ListBox.ItemTemplate>
+        <DataTemplate>
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+    </ListBox.ItemTemplate>
+</ListBox>
+```
+
+TreeViewSelectedItemChangedBehavior 
+
+```xml
+<TreeView ItemsSource="{Binding Families}" MinHeight="100">
+    <TreeView.Resources>
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:Family}" ItemsSource="{Binding Members}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Name}" />
+                <TextBlock Text=" [" Foreground="Blue" />
+                <TextBlock Text="{Binding Members.Count}" Foreground="Blue" />
+                <TextBlock Text="]" Foreground="Blue" />
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:FamilyMember}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Name}" />
+                <TextBlock Text=" (" Foreground="Green" />
+                <TextBlock Text="{Binding Age}" Foreground="Green" />
+                <TextBlock Text=" years)" Foreground="Green" />
+                <CheckBox IsChecked="{Binding IsActive}" />
+            </StackPanel>
+        </DataTemplate>
+    </TreeView.Resources>
+    <ml:Interaction.Behaviors>
+        <ml:TreeViewSelectedItemChangedBehavior 
+            ExpandSelected="True" 
+            SelectedItem="{Binding ActiveFamilyOrMember}" />
+    </ml:Interaction.Behaviors>
+</TreeView>
 ```
 
