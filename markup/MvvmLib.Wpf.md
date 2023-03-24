@@ -65,53 +65,6 @@ Example:
 ```
 
 
-## BindingProxy
-
-Example:
-
-```xml
-<DataGrid x:Name="DataGrid1" ItemsSource="{Binding CollectionView}" AutoGenerateColumns="False" IsReadOnly="True">
-    <DataGrid.Resources>
-        <!-- 1. Adds the Proxy in control or window resources-->
-        <mvvmLib:BindingProxy x:Key="Proxy"  Data="{Binding}"/>
-    </DataGrid.Resources>
-    <DataGrid.Columns>
-        <DataGridTextColumn Binding="{Binding FirstName}" Width="*">
-            <DataGridTextColumn.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Text="Name" />
-
-                    <local:DropDownButton Grid.Column="1">
-                        <local:DropDownButton.DropDownContent>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-
-                                <!-- code -->
-
-                                <StackPanel Orientation="Horizontal" Grid.Row="1">
-                                    <!-- 2. Use the Proxy as Source and bind with The Data dependency property -->
-                                    <Button Content="Filter" Command="{Binding Data.FilterFirstNameCommand, Source={StaticResource Proxy}}" />
-                                </StackPanel>
-                            </Grid>
-                        </local:DropDownButton.DropDownContent>
-                    </local:DropDownButton>
-                </Grid>
-            </DataGridTextColumn.Header>
-        </DataGridTextColumn>
-
-        <!-- other columns -->
-    </DataGrid.Columns>
-</DataGrid>
-```
-
 ## Navigation
 
 ### NavigationService
@@ -374,6 +327,23 @@ public partial class App : Application
         new Bootstrapper().Run();
     }
 }
+```
+
+## ContainerLocator
+
+Is used by MvvmLib to resolve all dependencies and configured by the bootstrapper in background.
+
+Manually (without Bootstrapper), example with Unity:
+
+```cs
+// Container is IUnityContainer
+ContainerLocator.SetContainerLocationProvider(() => new UnityContainerLocationProvider(Container))
+```
+
+Resolve a dependency
+
+```cs
+ContainerLocator.Current.Resolve(typeof(Shell));
 ```
 
 ### Mvvm Support
@@ -1074,3 +1044,50 @@ TreeViewSelectedItemChangedBehavior
 </TreeView>
 ```
 
+
+## BindingProxy
+
+Example:
+
+```xml
+<DataGrid x:Name="DataGrid1" ItemsSource="{Binding CollectionView}" AutoGenerateColumns="False" IsReadOnly="True">
+    <DataGrid.Resources>
+        <!-- 1. Adds the Proxy in control or window resources-->
+        <mvvmLib:BindingProxy x:Key="Proxy"  Data="{Binding}"/>
+    </DataGrid.Resources>
+    <DataGrid.Columns>
+        <DataGridTextColumn Binding="{Binding FirstName}" Width="*">
+            <DataGridTextColumn.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Name" />
+
+                    <local:DropDownButton Grid.Column="1">
+                        <local:DropDownButton.DropDownContent>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- code -->
+
+                                <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                    <!-- 2. Use the Proxy as Source and bind with The Data dependency property -->
+                                    <Button Content="Filter" Command="{Binding Data.FilterFirstNameCommand, Source={StaticResource Proxy}}" />
+                                </StackPanel>
+                            </Grid>
+                        </local:DropDownButton.DropDownContent>
+                    </local:DropDownButton>
+                </Grid>
+            </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+
+        <!-- other columns -->
+    </DataGrid.Columns>
+</DataGrid>
+```

@@ -37,9 +37,9 @@
 <ul class="currentrelative">
 <li class="tocentry"><a href="#viewmodellocator">ViewModelLocator</a></li>
 
-<li class="tocentry"><a href="#bindingproxy">BindingProxy</a></li>
-
 <li class="tocentry"><a href="#navigation">Navigation</a></li>
+
+<li class="tocentry"><a href="#containerlocator">ContainerLocator</a></li>
 
 <li class="tocentry"><a href="#create-a-custom-navigation-service">Create a custom Navigation Service</a></li>
 
@@ -48,6 +48,8 @@
 <li class="tocentry"><a href="#triggers-and-triggeractions">Triggers and TriggerActions</a></li>
 
 <li class="tocentry"><a href="#behaviors">Behaviors</a></li>
+
+<li class="tocentry"><a href="#bindingproxy">BindingProxy</a></li>
 
 
 
@@ -137,50 +139,6 @@ View model name:
         ...
          xmlns:ml=&quot;http://mvvmlib.com/&quot;
          ml:ViewModelLocator.AutoWireViewModel=&quot;True&quot;&gt;
-</code></pre>
-
-<h2 id="bindingproxy">BindingProxy<a class="headerlink" href="#bindingproxy" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>Example:</p>
-<pre><code class="xml">&lt;DataGrid x:Name=&quot;DataGrid1&quot; ItemsSource=&quot;{Binding CollectionView}&quot; AutoGenerateColumns=&quot;False&quot; IsReadOnly=&quot;True&quot;&gt;
-    &lt;DataGrid.Resources&gt;
-        &lt;!-- 1. Adds the Proxy in control or window resources--&gt;
-        &lt;mvvmLib:BindingProxy x:Key=&quot;Proxy&quot;  Data=&quot;{Binding}&quot;/&gt;
-    &lt;/DataGrid.Resources&gt;
-    &lt;DataGrid.Columns&gt;
-        &lt;DataGridTextColumn Binding=&quot;{Binding FirstName}&quot; Width=&quot;*&quot;&gt;
-            &lt;DataGridTextColumn.Header&gt;
-                &lt;Grid&gt;
-                    &lt;Grid.ColumnDefinitions&gt;
-                        &lt;ColumnDefinition/&gt;
-                        &lt;ColumnDefinition Width=&quot;Auto&quot; /&gt;
-                    &lt;/Grid.ColumnDefinitions&gt;
-
-                    &lt;TextBlock Text=&quot;Name&quot; /&gt;
-
-                    &lt;local:DropDownButton Grid.Column=&quot;1&quot;&gt;
-                        &lt;local:DropDownButton.DropDownContent&gt;
-                            &lt;Grid&gt;
-                                &lt;Grid.RowDefinitions&gt;
-                                    &lt;RowDefinition /&gt;
-                                    &lt;RowDefinition Height=&quot;Auto&quot;/&gt;
-                                &lt;/Grid.RowDefinitions&gt;
-
-                                &lt;!-- code --&gt;
-
-                                &lt;StackPanel Orientation=&quot;Horizontal&quot; Grid.Row=&quot;1&quot;&gt;
-                                    &lt;!-- 2. Use the Proxy as Source and bind with The Data dependency property --&gt;
-                                    &lt;Button Content=&quot;Filter&quot; Command=&quot;{Binding Data.FilterFirstNameCommand, Source={StaticResource Proxy}}&quot; /&gt;
-                                &lt;/StackPanel&gt;
-                            &lt;/Grid&gt;
-                        &lt;/local:DropDownButton.DropDownContent&gt;
-                    &lt;/local:DropDownButton&gt;
-                &lt;/Grid&gt;
-            &lt;/DataGridTextColumn.Header&gt;
-        &lt;/DataGridTextColumn&gt;
-
-        &lt;!-- other columns --&gt;
-    &lt;/DataGrid.Columns&gt;
-&lt;/DataGrid&gt;
 </code></pre>
 
 <h2 id="navigation">Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
@@ -488,6 +446,17 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
         new Bootstrapper().Run();
     }
 }
+</code></pre>
+
+<h2 id="containerlocator">ContainerLocator<a class="headerlink" href="#containerlocator" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Is used by MvvmLib to resolve all dependencies and configured by the bootstrapper in background.</p>
+<p>Manually (without Bootstrapper), example with Unity:</p>
+<pre><code class="cs">// Container is IUnityContainer
+ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocationProvider(Container))
+</code></pre>
+
+<p>Resolve a dependency</p>
+<pre><code class="cs">ContainerLocator.Current.Resolve(typeof(Shell));
 </code></pre>
 
 <h3 id="mvvm-support">Mvvm Support<a class="headerlink" href="#mvvm-support" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
@@ -1131,6 +1100,50 @@ public class CustomJournal : NavigationJournal
             SelectedItem=&quot;{Binding ActiveFamilyOrMember}&quot; /&gt;
     &lt;/ml:Interaction.Behaviors&gt;
 &lt;/TreeView&gt;
+</code></pre>
+
+<h2 id="bindingproxy">BindingProxy<a class="headerlink" href="#bindingproxy" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Example:</p>
+<pre><code class="xml">&lt;DataGrid x:Name=&quot;DataGrid1&quot; ItemsSource=&quot;{Binding CollectionView}&quot; AutoGenerateColumns=&quot;False&quot; IsReadOnly=&quot;True&quot;&gt;
+    &lt;DataGrid.Resources&gt;
+        &lt;!-- 1. Adds the Proxy in control or window resources--&gt;
+        &lt;mvvmLib:BindingProxy x:Key=&quot;Proxy&quot;  Data=&quot;{Binding}&quot;/&gt;
+    &lt;/DataGrid.Resources&gt;
+    &lt;DataGrid.Columns&gt;
+        &lt;DataGridTextColumn Binding=&quot;{Binding FirstName}&quot; Width=&quot;*&quot;&gt;
+            &lt;DataGridTextColumn.Header&gt;
+                &lt;Grid&gt;
+                    &lt;Grid.ColumnDefinitions&gt;
+                        &lt;ColumnDefinition/&gt;
+                        &lt;ColumnDefinition Width=&quot;Auto&quot; /&gt;
+                    &lt;/Grid.ColumnDefinitions&gt;
+
+                    &lt;TextBlock Text=&quot;Name&quot; /&gt;
+
+                    &lt;local:DropDownButton Grid.Column=&quot;1&quot;&gt;
+                        &lt;local:DropDownButton.DropDownContent&gt;
+                            &lt;Grid&gt;
+                                &lt;Grid.RowDefinitions&gt;
+                                    &lt;RowDefinition /&gt;
+                                    &lt;RowDefinition Height=&quot;Auto&quot;/&gt;
+                                &lt;/Grid.RowDefinitions&gt;
+
+                                &lt;!-- code --&gt;
+
+                                &lt;StackPanel Orientation=&quot;Horizontal&quot; Grid.Row=&quot;1&quot;&gt;
+                                    &lt;!-- 2. Use the Proxy as Source and bind with The Data dependency property --&gt;
+                                    &lt;Button Content=&quot;Filter&quot; Command=&quot;{Binding Data.FilterFirstNameCommand, Source={StaticResource Proxy}}&quot; /&gt;
+                                &lt;/StackPanel&gt;
+                            &lt;/Grid&gt;
+                        &lt;/local:DropDownButton.DropDownContent&gt;
+                    &lt;/local:DropDownButton&gt;
+                &lt;/Grid&gt;
+            &lt;/DataGridTextColumn.Header&gt;
+        &lt;/DataGridTextColumn&gt;
+
+        &lt;!-- other columns --&gt;
+    &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
 </code></pre>
 
 
