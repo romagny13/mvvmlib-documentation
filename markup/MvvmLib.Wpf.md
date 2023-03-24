@@ -900,12 +900,18 @@ public class User : Validatable, IEditableObject
 }
 ```
 
-### PagedList (IList extensions)
+### PagedList (IEnumerable T extension method)
 
 ```cs
 int pageNumber = 1;
 int pageSize = 50;
 var pagedList = Users.ToPagedList<User>(pageNumber, pageSize);
+```
+
+Binding
+
+```xml
+<ListBox ItemsSource="{Binding PagedList}"></ListBox>
 ```
 
 ### PagedSource

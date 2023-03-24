@@ -989,10 +989,14 @@ public class User : Validatable, IEditableObject
 }
 </code></pre>
 
-<h3 id="pagedlist-ilist-extensions">PagedList (IList extensions)<a class="headerlink" href="#pagedlist-ilist-extensions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<h3 id="pagedlist-ienumerable-t-extension-method">PagedList (IEnumerable T extension method)<a class="headerlink" href="#pagedlist-ienumerable-t-extension-method" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <pre><code class="cs">int pageNumber = 1;
 int pageSize = 50;
 var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
+</code></pre>
+
+<p>Binding</p>
+<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding PagedList}&quot;&gt;&lt;/ListBox&gt;
 </code></pre>
 
 <h3 id="pagedsource">PagedSource<a class="headerlink" href="#pagedsource" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
