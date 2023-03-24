@@ -1059,31 +1059,31 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <li>Simultaneous (boolean) allows to play simultaneously the animations.</li>
 <li>CanAnimateOnLoad: allows to cancel animation on load</li>
 </ul>
-<pre><code class="xml">&lt;mvvmLib:AnimatingContentControl mvvmLib:NavigationManager.SourceName=&quot;Main&quot;&gt;
-    &lt;mvvmLib:AnimatingContentControl.EntranceAnimation&gt;
+<pre><code class="xml">&lt;ml:AnimatingContentControl ml:NavigationManager.SourceName=&quot;Main&quot;&gt;
+    &lt;ml:AnimatingContentControl.EntranceAnimation&gt;
         &lt;Storyboard&gt;
             &lt;!-- Target &quot;CurrentContentPresenter&quot;  --&gt;
             &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot; 
                              Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
                              From=&quot;400&quot; To=&quot;0&quot; Duration=&quot;0:0:0.4&quot;  /&gt;
         &lt;/Storyboard&gt;
-    &lt;/mvvmLib:AnimatingContentControl.EntranceAnimation&gt;
-    &lt;mvvmLib:AnimatingContentControl.ExitAnimation&gt;
+    &lt;/ml:AnimatingContentControl.EntranceAnimation&gt;
+    &lt;ml:AnimatingContentControl.ExitAnimation&gt;
         &lt;Storyboard&gt;
             &lt;!-- Target &quot;CurrentContentPresenter&quot; or with Simultaneous &quot;PreviousContentPresenter&quot; --&gt;
             &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot; 
                              Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
                              From=&quot;0&quot; To=&quot;400&quot; Duration=&quot;0:0:0.4&quot;  /&gt;
         &lt;/Storyboard&gt;
-    &lt;/mvvmLib:AnimatingContentControl.ExitAnimation&gt;
-&lt;/mvvmLib:AnimatingContentControl&gt;
+    &lt;/ml:AnimatingContentControl.ExitAnimation&gt;
+&lt;/ml:AnimatingContentControl&gt;
 </code></pre>
 
 <p>Or Simultaneous</p>
-<pre><code class="xml">  &lt;mvvmLib:AnimatingContentControl Content=&quot;{Binding Navigation.Current}&quot; 
+<pre><code class="xml">  &lt;ml:AnimatingContentControl Content=&quot;{Binding Navigation.Current}&quot; 
                                     Simultaneous=&quot;True&quot;
                                     IsCancelled=&quot;{Binding IsCancelled}&quot;&gt;
-    &lt;mvvmLib:AnimatingContentControl.EntranceAnimation&gt;
+    &lt;ml:AnimatingContentControl.EntranceAnimation&gt;
         &lt;Storyboard&gt;
             &lt;DoubleAnimation  Storyboard.TargetName=&quot;CurrentContentPresenter&quot;
                                 Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
@@ -1094,8 +1094,8 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
                 &lt;/DoubleAnimation.EasingFunction&gt;
             &lt;/DoubleAnimation&gt;
         &lt;/Storyboard&gt;
-    &lt;/mvvmLib:AnimatingContentControl.EntranceAnimation&gt;
-    &lt;mvvmLib:AnimatingContentControl.ExitAnimation&gt;
+    &lt;/ml:AnimatingContentControl.EntranceAnimation&gt;
+    &lt;ml:AnimatingContentControl.ExitAnimation&gt;
         &lt;Storyboard&gt;
             &lt;DoubleAnimation  Storyboard.TargetName=&quot;PreviousContentPresenter&quot;
                                 Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
@@ -1106,8 +1106,8 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
                 &lt;/DoubleAnimation.EasingFunction&gt;
             &lt;/DoubleAnimation&gt;
         &lt;/Storyboard&gt;
-    &lt;/mvvmLib:AnimatingContentControl.ExitAnimation&gt;
-&lt;/mvvmLib:AnimatingContentControl&gt;
+    &lt;/ml:AnimatingContentControl.ExitAnimation&gt;
+&lt;/ml:AnimatingContentControl&gt;
 </code></pre>
 
 <p>Other sample: animations in resources</p>
@@ -1126,26 +1126,26 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 &lt;/UserControl.Resources&gt;
 </code></pre>
 
-<pre><code class="xml">&lt;mvvmLib:AnimatingContentControl Content=&quot;{Binding Navigation.Current}&quot; 
+<pre><code class="xml">&lt;ml:AnimatingContentControl Content=&quot;{Binding Navigation.Current}&quot; 
                                  EntranceAnimation=&quot;{StaticResource EntranceAnimation1}&quot;
                                  ExitAnimation=&quot;{StaticResource ExitAnimation1}&quot;&gt;
-&lt;/mvvmLib:AnimatingContentControl&gt;
+&lt;/ml:AnimatingContentControl&gt;
 </code></pre>
 
 <p>Other sample: Change Animations dynamically and controlling when the animation is played with &quot;CanAnimate&quot;. For a Schedule view for example.</p>
-<pre><code class="xml">&lt;mvvmLib:AnimatingContentControl  Content=&quot;{Binding Navigation.Current}&quot; 
+<pre><code class="xml">&lt;ml:AnimatingContentControl  Content=&quot;{Binding Navigation.Current}&quot; 
                                   CanAnimate=&quot;{Binding CanAnimate, Mode=OneWay}&quot; 
                                   CanAnimateOnLoad=&quot;False&quot;
                                   EntranceAnimation=&quot;{Binding EntranceAnimation, Mode=OneWay}&quot;
                                   ExitAnimation=&quot;{Binding ExitAnimation, Mode=OneWay}&quot;&gt;
 
-    &lt;mvvmLib:Interaction.Triggers&gt;
-        &lt;mvvmLib:EventTrigger EventName=&quot;AnimationCompleted&quot;&gt;
-            &lt;mvvmLib:CallMethodAction TargetObject=&quot;{Binding}&quot; MethodName=&quot;CompleteChangingScheduleMode&quot;/&gt;
-        &lt;/mvvmLib:EventTrigger&gt;
-    &lt;/mvvmLib:Interaction.Triggers&gt;
+    &lt;ml:Interaction.Triggers&gt;
+        &lt;ml:EventTrigger EventName=&quot;AnimationCompleted&quot;&gt;
+            &lt;ml:CallMethodAction TargetObject=&quot;{Binding}&quot; MethodName=&quot;CompleteChangingScheduleMode&quot;/&gt;
+        &lt;/ml:EventTrigger&gt;
+    &lt;/ml:Interaction.Triggers&gt;
 
-&lt;/mvvmLib:AnimatingContentControl&gt;
+&lt;/ml:AnimatingContentControl&gt;
 </code></pre>
 
 <h3 id="transitioningcontentcontrol">TransitioningContentControl<a class="headerlink" href="#transitioningcontentcontrol" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
@@ -1162,8 +1162,8 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <li>CancelTransition</li>
 <li>Reset: reset the render transform property and opacity + cancel transition</li>
 </ul>
-<pre><code class="xml">&lt;mvvmLib:TransitioningContentControl x:Name=&quot;TransitioningContentControl1&quot; Margin=&quot;0,20&quot;&gt;
-        &lt;mvvmLib:TransitioningContentControl.EntranceTransition&gt;
+<pre><code class="xml">&lt;ml:TransitioningContentControl x:Name=&quot;TransitioningContentControl1&quot; Margin=&quot;0,20&quot;&gt;
+        &lt;ml:TransitioningContentControl.EntranceTransition&gt;
             &lt;Storyboard&gt;
                 &lt;DoubleAnimation Storyboard.TargetName=&quot;ContentPresenter&quot; 
                                     Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)&quot; 
@@ -1173,14 +1173,14 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
                     &lt;/DoubleAnimation.EasingFunction&gt;
                 &lt;/DoubleAnimation&gt;
             &lt;/Storyboard&gt;
-        &lt;/mvvmLib:TransitioningContentControl.EntranceTransition&gt;
-        &lt;mvvmLib:TransitioningContentControl.ExitTransition&gt;
+        &lt;/ml:TransitioningContentControl.EntranceTransition&gt;
+        &lt;ml:TransitioningContentControl.ExitTransition&gt;
             &lt;Storyboard&gt;
                 &lt;DoubleAnimation Storyboard.TargetName=&quot;ContentPresenter&quot; 
                                     Storyboard.TargetProperty=&quot;(UIElement.Opacity)&quot; 
                                     From=&quot;1&quot; To=&quot;0&quot; Duration=&quot;0:0:2&quot;/&gt;
             &lt;/Storyboard&gt;
-&lt;/mvvmLib:TransitioningContentControl.ExitTransition&gt;
+&lt;/ml:TransitioningContentControl.ExitTransition&gt;
 </code></pre>
 
 <h3 id="transitioningitemscontrol">TransitioningItemsControl<a class="headerlink" href="#transitioningitemscontrol" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
@@ -1188,27 +1188,27 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <p>ItemsControl that allows to animate on item insertion and deletion. </p>
 </blockquote>
 <p>The &quot;ControlledAnimation&quot; avoid to set the target and the target property of the storyboard. The TargetPropertyType is a shortcut. But it's possible to target explicitly the target property of the storyboard with &quot;TargetProperty&quot; dependency property.</p>
-<pre><code class="xml">&lt;mvvmLib:TransitioningItemsControl ItemsSource=&quot;{Binding MyItems}&quot; 
+<pre><code class="xml">&lt;ml:TransitioningItemsControl ItemsSource=&quot;{Binding MyItems}&quot; 
                                    TransitionClearHandling=&quot;Transition&quot;
                                    IsCancelled=&quot;{Binding IsCancelled}&quot;&gt;
-    &lt;mvvmLib:TransitioningItemsControl.EntranceAnimation&gt;
-        &lt;mvvmLib:ParallelAnimation&gt;
+    &lt;ml:TransitioningItemsControl.EntranceAnimation&gt;
+        &lt;ml:ParallelAnimation&gt;
 
-            &lt;mvvmLib:ControlledAnimation TargetPropertyType=&quot;TranslateX&quot;&gt;
+            &lt;ml:ControlledAnimation TargetPropertyType=&quot;TranslateX&quot;&gt;
                 &lt;DoubleAnimation From=&quot;200&quot; To=&quot;0&quot;  Duration=&quot;0:0:2&quot;/&gt;
-            &lt;/mvvmLib:ControlledAnimation&gt;
+            &lt;/ml:ControlledAnimation&gt;
 
-        &lt;/mvvmLib:ParallelAnimation&gt;
-    &lt;/mvvmLib:TransitioningItemsControl.EntranceAnimation&gt;
+        &lt;/ml:ParallelAnimation&gt;
+    &lt;/ml:TransitioningItemsControl.EntranceAnimation&gt;
 
-    &lt;mvvmLib:TransitioningItemsControl.ExitAnimation&gt;
-        &lt;mvvmLib:ParallelAnimation&gt;
-            &lt;mvvmLib:ControlledAnimation TargetPropertyType=&quot;TranslateX&quot;&gt;
+    &lt;ml:TransitioningItemsControl.ExitAnimation&gt;
+        &lt;ml:ParallelAnimation&gt;
+            &lt;ml:ControlledAnimation TargetPropertyType=&quot;TranslateX&quot;&gt;
                 &lt;DoubleAnimation From=&quot;0&quot; To=&quot;200&quot; Duration=&quot;0:0:2&quot;/&gt;
-            &lt;/mvvmLib:ControlledAnimation&gt;
-        &lt;/mvvmLib:ParallelAnimation&gt;
-    &lt;/mvvmLib:TransitioningItemsControl.ExitAnimation&gt;
-&lt;/mvvmLib:TransitioningItemsControl&gt;
+            &lt;/ml:ControlledAnimation&gt;
+        &lt;/ml:ParallelAnimation&gt;
+    &lt;/ml:TransitioningItemsControl.ExitAnimation&gt;
+&lt;/ml:TransitioningItemsControl&gt;
 </code></pre>
 
 <h3 id="navigatablecontentcontrol">NavigatableContentControl<a class="headerlink" href="#navigatablecontentcontrol" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
@@ -1235,26 +1235,26 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <h2 id="triggers-and-triggeractions">Triggers and TriggerActions<a class="headerlink" href="#triggers-and-triggeractions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>Example:</p>
 <pre><code class="xml">&lt;Button x:Name=&quot;Button1&quot; Content=&quot;Click!&quot;&gt;
-    &lt;mvvmLib:Interaction.Triggers&gt;
-        &lt;mvvmLib:EventTrigger EventName=&quot;Click&quot;&gt;
-            &lt;mvvmLib:CallMethodAction TargetObject=&quot;{Binding}&quot; MethodName=&quot;SayHello&quot; Parameter=&quot;My parameter&quot; /&gt;
-            &lt;mvvmLib:InvokeCommandAction Command=&quot;{Binding MyCommand}&quot; CommandParameter=&quot;My parameter&quot;/&gt;
-            &lt;mvvmLib:ChangePropertyAction TargetObject=&quot;{Binding ElementName=Button1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Red&quot;/&gt;
-        &lt;/mvvmLib:EventTrigger&gt;
-    &lt;/mvvmLib:Interaction.Triggers&gt;
+    &lt;ml:Interaction.Triggers&gt;
+        &lt;ml:EventTrigger EventName=&quot;Click&quot;&gt;
+            &lt;ml:CallMethodAction TargetObject=&quot;{Binding}&quot; MethodName=&quot;SayHello&quot; Parameter=&quot;My parameter&quot; /&gt;
+            &lt;ml:InvokeCommandAction Command=&quot;{Binding MyCommand}&quot; CommandParameter=&quot;My parameter&quot;/&gt;
+            &lt;ml:ChangePropertyAction TargetObject=&quot;{Binding ElementName=Button1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Red&quot;/&gt;
+        &lt;/ml:EventTrigger&gt;
+    &lt;/ml:Interaction.Triggers&gt;
 &lt;/Button&gt;
 </code></pre>
 
 <p>DataTrigger sample</p>
 <pre><code class="xml">&lt;TextBlock x:Name=&quot;TextBlock1&quot; Text=&quot;{Binding MyValue}&quot;&gt;
-    &lt;mvvmLib:Interaction.Triggers&gt;
-        &lt;mvvmLib:DataTrigger Binding=&quot;{Binding MyValue}&quot; Value=&quot;My value&quot;&gt;
-            &lt;mvvmLib:ChangePropertyAction TargetObject=&quot;{Binding ElementName=TextBlock1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Red&quot;/&gt;
-        &lt;/mvvmLib:DataTrigger&gt;
-        &lt;mvvmLib:DataTrigger Binding=&quot;{Binding MyValue}&quot; Comparison=&quot;NotEqual&quot; Value=&quot;My value&quot;&gt;
-            &lt;mvvmLib:ChangePropertyAction TargetObject=&quot;{Binding ElementName=TextBlock1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Blue&quot;/&gt;
-        &lt;/mvvmLib:DataTrigger&gt;
-    &lt;/mvvmLib:Interaction.Triggers&gt;
+    &lt;ml:Interaction.Triggers&gt;
+        &lt;ml:DataTrigger Binding=&quot;{Binding MyValue}&quot; Value=&quot;My value&quot;&gt;
+            &lt;ml:ChangePropertyAction TargetObject=&quot;{Binding ElementName=TextBlock1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Red&quot;/&gt;
+        &lt;/ml:DataTrigger&gt;
+        &lt;ml:DataTrigger Binding=&quot;{Binding MyValue}&quot; Comparison=&quot;NotEqual&quot; Value=&quot;My value&quot;&gt;
+            &lt;ml:ChangePropertyAction TargetObject=&quot;{Binding ElementName=TextBlock1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Blue&quot;/&gt;
+        &lt;/ml:DataTrigger&gt;
+    &lt;/ml:Interaction.Triggers&gt;
 &lt;/TextBlock&gt;
 </code></pre>
 
@@ -1304,9 +1304,9 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <h2 id="behaviors">Behaviors<a class="headerlink" href="#behaviors" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>EventToCommandBehavior</p>
 <pre><code class="xml">&lt;Button Content=&quot;Click event&quot;&gt;
-    &lt;mvvmLib:NavigationInteraction.Behaviors&gt;
-        &lt;mvvmLib:EventToCommandBehavior EventName=&quot;Click&quot; Command=&quot;{Binding MessageCommand}&quot; CommandParameter=&quot;World&quot;/&gt;
-    &lt;/mvvmLib:NavigationInteraction.Behaviors&gt;
+    &lt;ml:NavigationInteraction.Behaviors&gt;
+        &lt;ml:EventToCommandBehavior EventName=&quot;Click&quot; Command=&quot;{Binding MessageCommand}&quot; CommandParameter=&quot;World&quot;/&gt;
+    &lt;/ml:NavigationInteraction.Behaviors&gt;
 &lt;/Button&gt;
 </code></pre>
 
@@ -1360,7 +1360,7 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <pre><code class="xml">&lt;DataGrid x:Name=&quot;DataGrid1&quot; ItemsSource=&quot;{Binding CollectionView}&quot; AutoGenerateColumns=&quot;False&quot; IsReadOnly=&quot;True&quot;&gt;
     &lt;DataGrid.Resources&gt;
         &lt;!-- 1. Adds the Proxy in control or window resources--&gt;
-        &lt;mvvmLib:BindingProxy x:Key=&quot;Proxy&quot;  Data=&quot;{Binding}&quot;/&gt;
+        &lt;ml:BindingProxy x:Key=&quot;Proxy&quot;  Data=&quot;{Binding}&quot;/&gt;
     &lt;/DataGrid.Resources&gt;
     &lt;DataGrid.Columns&gt;
         &lt;DataGridTextColumn Binding=&quot;{Binding FirstName}&quot; Width=&quot;*&quot;&gt;

@@ -981,33 +981,33 @@ It's possible to create a `DataPager` and the methods of the PagedSource
 * CanAnimateOnLoad: allows to cancel animation on load
 
 ```xml
-<mvvmLib:AnimatingContentControl mvvmLib:NavigationManager.SourceName="Main">
-    <mvvmLib:AnimatingContentControl.EntranceAnimation>
+<ml:AnimatingContentControl ml:NavigationManager.SourceName="Main">
+    <ml:AnimatingContentControl.EntranceAnimation>
         <Storyboard>
             <!-- Target "CurrentContentPresenter"  -->
             <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
                              Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
                              From="400" To="0" Duration="0:0:0.4"  />
         </Storyboard>
-    </mvvmLib:AnimatingContentControl.EntranceAnimation>
-    <mvvmLib:AnimatingContentControl.ExitAnimation>
+    </ml:AnimatingContentControl.EntranceAnimation>
+    <ml:AnimatingContentControl.ExitAnimation>
         <Storyboard>
             <!-- Target "CurrentContentPresenter" or with Simultaneous "PreviousContentPresenter" -->
             <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
                              Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
                              From="0" To="400" Duration="0:0:0.4"  />
         </Storyboard>
-    </mvvmLib:AnimatingContentControl.ExitAnimation>
-</mvvmLib:AnimatingContentControl>
+    </ml:AnimatingContentControl.ExitAnimation>
+</ml:AnimatingContentControl>
 ```
 
 Or Simultaneous
 
 ```xml
-  <mvvmLib:AnimatingContentControl Content="{Binding Navigation.Current}" 
+  <ml:AnimatingContentControl Content="{Binding Navigation.Current}" 
                                     Simultaneous="True"
                                     IsCancelled="{Binding IsCancelled}">
-    <mvvmLib:AnimatingContentControl.EntranceAnimation>
+    <ml:AnimatingContentControl.EntranceAnimation>
         <Storyboard>
             <DoubleAnimation  Storyboard.TargetName="CurrentContentPresenter"
                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
@@ -1018,8 +1018,8 @@ Or Simultaneous
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
-    </mvvmLib:AnimatingContentControl.EntranceAnimation>
-    <mvvmLib:AnimatingContentControl.ExitAnimation>
+    </ml:AnimatingContentControl.EntranceAnimation>
+    <ml:AnimatingContentControl.ExitAnimation>
         <Storyboard>
             <DoubleAnimation  Storyboard.TargetName="PreviousContentPresenter"
                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
@@ -1030,8 +1030,8 @@ Or Simultaneous
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
-    </mvvmLib:AnimatingContentControl.ExitAnimation>
-</mvvmLib:AnimatingContentControl>
+    </ml:AnimatingContentControl.ExitAnimation>
+</ml:AnimatingContentControl>
 ```
 
 Other sample: animations in resources
@@ -1054,28 +1054,28 @@ Other sample: animations in resources
 ```
 
 ```xml
-<mvvmLib:AnimatingContentControl Content="{Binding Navigation.Current}" 
+<ml:AnimatingContentControl Content="{Binding Navigation.Current}" 
                                  EntranceAnimation="{StaticResource EntranceAnimation1}"
                                  ExitAnimation="{StaticResource ExitAnimation1}">
-</mvvmLib:AnimatingContentControl>
+</ml:AnimatingContentControl>
 ```
 
 Other sample: Change Animations dynamically and controlling when the animation is played with "CanAnimate". For a Schedule view for example.
 
 ```xml
-<mvvmLib:AnimatingContentControl  Content="{Binding Navigation.Current}" 
+<ml:AnimatingContentControl  Content="{Binding Navigation.Current}" 
                                   CanAnimate="{Binding CanAnimate, Mode=OneWay}" 
                                   CanAnimateOnLoad="False"
                                   EntranceAnimation="{Binding EntranceAnimation, Mode=OneWay}"
                                   ExitAnimation="{Binding ExitAnimation, Mode=OneWay}">
 
-    <mvvmLib:Interaction.Triggers>
-        <mvvmLib:EventTrigger EventName="AnimationCompleted">
-            <mvvmLib:CallMethodAction TargetObject="{Binding}" MethodName="CompleteChangingScheduleMode"/>
-        </mvvmLib:EventTrigger>
-    </mvvmLib:Interaction.Triggers>
+    <ml:Interaction.Triggers>
+        <ml:EventTrigger EventName="AnimationCompleted">
+            <ml:CallMethodAction TargetObject="{Binding}" MethodName="CompleteChangingScheduleMode"/>
+        </ml:EventTrigger>
+    </ml:Interaction.Triggers>
 
-</mvvmLib:AnimatingContentControl>
+</ml:AnimatingContentControl>
 ```
 
 
@@ -1094,8 +1094,8 @@ Other methods:
 * Reset: reset the render transform property and opacity + cancel transition
 
 ```xml
-<mvvmLib:TransitioningContentControl x:Name="TransitioningContentControl1" Margin="0,20">
-        <mvvmLib:TransitioningContentControl.EntranceTransition>
+<ml:TransitioningContentControl x:Name="TransitioningContentControl1" Margin="0,20">
+        <ml:TransitioningContentControl.EntranceTransition>
             <Storyboard>
                 <DoubleAnimation Storyboard.TargetName="ContentPresenter" 
                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" 
@@ -1105,14 +1105,14 @@ Other methods:
                     </DoubleAnimation.EasingFunction>
                 </DoubleAnimation>
             </Storyboard>
-        </mvvmLib:TransitioningContentControl.EntranceTransition>
-        <mvvmLib:TransitioningContentControl.ExitTransition>
+        </ml:TransitioningContentControl.EntranceTransition>
+        <ml:TransitioningContentControl.ExitTransition>
             <Storyboard>
                 <DoubleAnimation Storyboard.TargetName="ContentPresenter" 
                                     Storyboard.TargetProperty="(UIElement.Opacity)" 
                                     From="1" To="0" Duration="0:0:2"/>
             </Storyboard>
-</mvvmLib:TransitioningContentControl.ExitTransition>
+</ml:TransitioningContentControl.ExitTransition>
 ```
 
 ### TransitioningItemsControl
@@ -1122,27 +1122,27 @@ Other methods:
 The "ControlledAnimation" avoid to set the target and the target property of the storyboard. The TargetPropertyType is a shortcut. But it's possible to target explicitly the target property of the storyboard with "TargetProperty" dependency property.
 
 ```xml
-<mvvmLib:TransitioningItemsControl ItemsSource="{Binding MyItems}" 
+<ml:TransitioningItemsControl ItemsSource="{Binding MyItems}" 
                                    TransitionClearHandling="Transition"
                                    IsCancelled="{Binding IsCancelled}">
-    <mvvmLib:TransitioningItemsControl.EntranceAnimation>
-        <mvvmLib:ParallelAnimation>
+    <ml:TransitioningItemsControl.EntranceAnimation>
+        <ml:ParallelAnimation>
 
-            <mvvmLib:ControlledAnimation TargetPropertyType="TranslateX">
+            <ml:ControlledAnimation TargetPropertyType="TranslateX">
                 <DoubleAnimation From="200" To="0"  Duration="0:0:2"/>
-            </mvvmLib:ControlledAnimation>
+            </ml:ControlledAnimation>
 
-        </mvvmLib:ParallelAnimation>
-    </mvvmLib:TransitioningItemsControl.EntranceAnimation>
+        </ml:ParallelAnimation>
+    </ml:TransitioningItemsControl.EntranceAnimation>
 
-    <mvvmLib:TransitioningItemsControl.ExitAnimation>
-        <mvvmLib:ParallelAnimation>
-            <mvvmLib:ControlledAnimation TargetPropertyType="TranslateX">
+    <ml:TransitioningItemsControl.ExitAnimation>
+        <ml:ParallelAnimation>
+            <ml:ControlledAnimation TargetPropertyType="TranslateX">
                 <DoubleAnimation From="0" To="200" Duration="0:0:2"/>
-            </mvvmLib:ControlledAnimation>
-        </mvvmLib:ParallelAnimation>
-    </mvvmLib:TransitioningItemsControl.ExitAnimation>
-</mvvmLib:TransitioningItemsControl>
+            </ml:ControlledAnimation>
+        </ml:ParallelAnimation>
+    </ml:TransitioningItemsControl.ExitAnimation>
+</ml:TransitioningItemsControl>
 ```
 
 ### NavigatableContentControl
@@ -1178,13 +1178,13 @@ Example:
 
 ```xml
 <Button x:Name="Button1" Content="Click!">
-    <mvvmLib:Interaction.Triggers>
-        <mvvmLib:EventTrigger EventName="Click">
-            <mvvmLib:CallMethodAction TargetObject="{Binding}" MethodName="SayHello" Parameter="My parameter" />
-            <mvvmLib:InvokeCommandAction Command="{Binding MyCommand}" CommandParameter="My parameter"/>
-            <mvvmLib:ChangePropertyAction TargetObject="{Binding ElementName=Button1}" PropertyPath="Foreground" Value="Red"/>
-        </mvvmLib:EventTrigger>
-    </mvvmLib:Interaction.Triggers>
+    <ml:Interaction.Triggers>
+        <ml:EventTrigger EventName="Click">
+            <ml:CallMethodAction TargetObject="{Binding}" MethodName="SayHello" Parameter="My parameter" />
+            <ml:InvokeCommandAction Command="{Binding MyCommand}" CommandParameter="My parameter"/>
+            <ml:ChangePropertyAction TargetObject="{Binding ElementName=Button1}" PropertyPath="Foreground" Value="Red"/>
+        </ml:EventTrigger>
+    </ml:Interaction.Triggers>
 </Button>
 ```
 
@@ -1192,14 +1192,14 @@ DataTrigger sample
 
 ```xml
 <TextBlock x:Name="TextBlock1" Text="{Binding MyValue}">
-    <mvvmLib:Interaction.Triggers>
-        <mvvmLib:DataTrigger Binding="{Binding MyValue}" Value="My value">
-            <mvvmLib:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock1}" PropertyPath="Foreground" Value="Red"/>
-        </mvvmLib:DataTrigger>
-        <mvvmLib:DataTrigger Binding="{Binding MyValue}" Comparison="NotEqual" Value="My value">
-            <mvvmLib:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock1}" PropertyPath="Foreground" Value="Blue"/>
-        </mvvmLib:DataTrigger>
-    </mvvmLib:Interaction.Triggers>
+    <ml:Interaction.Triggers>
+        <ml:DataTrigger Binding="{Binding MyValue}" Value="My value">
+            <ml:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock1}" PropertyPath="Foreground" Value="Red"/>
+        </ml:DataTrigger>
+        <ml:DataTrigger Binding="{Binding MyValue}" Comparison="NotEqual" Value="My value">
+            <ml:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock1}" PropertyPath="Foreground" Value="Blue"/>
+        </ml:DataTrigger>
+    </ml:Interaction.Triggers>
 </TextBlock>
 ```
 
@@ -1259,9 +1259,9 @@ EventToCommandBehavior
 
 ```xml
 <Button Content="Click event">
-    <mvvmLib:NavigationInteraction.Behaviors>
-        <mvvmLib:EventToCommandBehavior EventName="Click" Command="{Binding MessageCommand}" CommandParameter="World"/>
-    </mvvmLib:NavigationInteraction.Behaviors>
+    <ml:NavigationInteraction.Behaviors>
+        <ml:EventToCommandBehavior EventName="Click" Command="{Binding MessageCommand}" CommandParameter="World"/>
+    </ml:NavigationInteraction.Behaviors>
 </Button>
 ```
 
@@ -1323,7 +1323,7 @@ Example:
 <DataGrid x:Name="DataGrid1" ItemsSource="{Binding CollectionView}" AutoGenerateColumns="False" IsReadOnly="True">
     <DataGrid.Resources>
         <!-- 1. Adds the Proxy in control or window resources-->
-        <mvvmLib:BindingProxy x:Key="Proxy"  Data="{Binding}"/>
+        <ml:BindingProxy x:Key="Proxy"  Data="{Binding}"/>
     </DataGrid.Resources>
     <DataGrid.Columns>
         <DataGridTextColumn Binding="{Binding FirstName}" Width="*">
