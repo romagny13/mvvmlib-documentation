@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MvvmLib.IoC - MvvmLib Documentation</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="css/styles/vs.css">
+    <link rel="stylesheet" href="css/font-awesome.4.5.0.min.css">
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="index.htm"><i class="fa fa-home"></i> MvvmLib Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="index.htm">Home</a>
+</li>
+
+<li class="tocentry"><a href="MvvmLib.Core.htm">MvvmLib.Core</a>
+</li>
+<li class="tocentry"><a href="MvvmLib.Wpf.htm">MvvmLib.Wpf</a>
+</li>
+<li class="tocentry current"><a class="current" href="MvvmLib.IoC.htm">MvvmLib.IoC</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#comparison">Comparison</a></li>
+
+<li class="tocentry"><a href="#registration">Registration</a></li>
+
+<li class="tocentry"><a href="#registering-type-for-all-implemented-interfaces">Registering Type for all implemented interfaces</a></li>
+
+<li class="tocentry"><a href="#registering-singleton-for-all-implemented-interfaces">Registering Singleton for all implemented interfaces</a></li>
+
+<li class="tocentry"><a href="#registering-scoped-for-all-implemented-interfaces">Registering Scoped for all implemented interfaces</a></li>
+
+<li class="tocentry"><a href="#preferredimplementationattribute">PreferredImplementationAttribute</a></li>
+
+<li class="tocentry"><a href="#injection-parameters">Injection Parameters</a></li>
+
+<li class="tocentry"><a href="#resolve">Resolve</a></li>
+
+<li class="tocentry"><a href="#func">Func</a></li>
+
+<li class="tocentry"><a href="#lazy">Lazy</a></li>
+
+<li class="tocentry"><a href="#property-injection">Property Injection</a></li>
+
+<li class="tocentry"><a href="#onresolved-callback">OnResolved Callback</a></li>
+
+<li class="tocentry"><a href="#resolve-all">Resolve All</a></li>
+
+<li class="tocentry"><a href="#autodiscovery">AutoDiscovery</a></li>
+
+<li class="tocentry"><a href="#nonpublicconstructors">NonPublicConstructors</a></li>
+
+<li class="tocentry"><a href="#preferredconstructorattribute">PreferredConstructorAttribute</a></li>
+
+<li class="tocentry"><a href="#constructor-selector">Constructor Selector</a></li>
+
+<li class="tocentry"><a href="#delegatefactory">DelegateFactory</a></li>
+
+<li class="tocentry"><a href="#interceptors">Interceptors</a></li>
+
+<li class="tocentry"><a href="#resolvers">Resolvers</a></li>
+
+<li class="tocentry"><a href="#events">Events</a></li>
+
+
+
+</ul>
+<li class="tocentry"><a href="MvvmLib.Scanning.htm">MvvmLib.Scanning</a>
+</li>
+<li class="tocentry"><a href="LICENSE.htm">LICENSE</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="index.htm">MvvmLib Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="index.htm">Home</a></li> / <li><a href="MvvmLib.IoC.htm">MvvmLib.IoC</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="di-dependency-injection-with-injector">DI (Dependency Injection) with Injector<a class="headerlink" href="#di-dependency-injection-with-injector" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<blockquote>
+<p>The injector allows to <strong>resolve all types and types for implemented interfaces automatically</strong> (views, view models, services) </p>
+</blockquote>
+<ul>
+<li><strong>Auto discovery</strong> of types and impletation types for interfaces not registered</li>
+<li>Allows to <strong>register</strong> and <strong>resolve types, instances, factories</strong></li>
+<li><strong>injection parameters</strong> and <strong>properties</strong></li>
+<li><strong>Lifetimes</strong>: Transcient, Singleton, InstancePerScope, InstancePerMatchingScope</li>
+<li><strong>Scopes</strong> and <strong>child scopes</strong></li>
+<li><strong>Interceptors</strong> allow to intercept value resolution</li>
+<li>Custom value resolvers</li>
+<li>Attributes: <strong>PreferredConstructor</strong>, <strong>PreferredImplementation</strong> (for interfaces), <strong>Dependency</strong> (for properties and parameters) </li>
+</ul>
+<p><strong>Require to be registered :</strong></p>
+<ul>
+<li><strong>Singletons</strong></li>
+<li>Registrations with name</li>
+<li>Registration with injection parameters/ properties</li>
+<li>Use the <strong>PreferredImplementation attribute</strong> with many implementation of interfaces.</li>
+</ul>
+<h2 id="comparison">Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p><em>For example with Autofac</em></p>
+<p><strong>Autofac</strong></p>
+<img src="https://res.cloudinary.com/romagny13/image/upload/v1559055307/comp_autofac_bsognl.png" />
+<p><strong>Injector</strong></p>
+<img src="https://res.cloudinary.com/romagny13/image/upload/v1565189594/ioc-1_vi1oy3.png" />
+<p>Namespace: required for extensions methods</p>
+<pre><code class="cs">using MvvmLib.IoC;
+</code></pre>
+
+<h2 id="registration">Registration<a class="headerlink" href="#registration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<blockquote>
+<p>The injector allows to <strong>resolve all types and types for implemented interfaces automatically</strong> but it's possible to register &quot;manually&quot; the services.</p>
+</blockquote>
+<p><em>Types</em></p>
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterType(typeof(MyItem));
+injector.RegisterType(typeof(MyItem), &quot;MyName&quot;); // with name
+injector.RegisterType(typeof(IMyService), typeof(MyService));
+injector.RegisterType(typeof(IMyService), typeof(MyService), &quot;MyName&quot;); // with name
+</code></pre>
+
+<p>With extension methods</p>
+<pre><code class="cs">using MvvmLib.IoC;
+// ...
+
+var injector = new Injector();
+
+injector.RegisterType&lt;MyItem&gt;();
+injector.RegisterType&lt;MyItem&gt;(&quot;MyName&quot;); // with name
+injector.RegisterType&lt;IMyService, MyService&gt;();
+injector.RegisterType&lt;IMyService, MyService&gt;(&quot;MyName&quot;); // with name
+</code></pre>
+
+<p><em>Instances</em></p>
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterInstance(typeof(MyItem), new MyItem());
+injector.RegisterInstance(typeof(MyItem), new MyItem(), &quot;MyName&quot;); // with name
+</code></pre>
+
+<p>With extension methods</p>
+<pre><code class="cs">using MvvmLib.IoC;
+// ...
+
+var injector = new Injector();
+
+injector.RegisterInstance&lt;MyItem&gt;(new MyItem());
+injector.RegisterInstance&lt;MyItem&gt;(new MyItem(), &quot;MyName&quot;, ); // with name
+</code></pre>
+
+<p><em>Factories</em></p>
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterFactory(typeof(MyItem), () =&gt; new MyItem());
+injector.RegisterFactory(typeof(MyItem), () =&gt; new MyItem(), &quot;MyName&quot;); // with name
+</code></pre>
+
+<p>With extension methods</p>
+<pre><code class="cs">using MvvmLib.IoC;
+// ...
+
+var injector = new Injector();
+
+injector.RegisterFactory&lt;MyItem&gt;(() =&gt; new MyItem());
+injector.RegisterFactory&lt;MyItem&gt;(() =&gt; new MyItem(), &quot;MyName&quot;); // with name
+</code></pre>
+
+<h3 id="lifetimes">Lifetimes<a class="headerlink" href="#lifetimes" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<ul>
+<li>Transcient by default (TranscientLifetime): get always a new instance</li>
+<li>Singleton (SingletonLifetime): get always the same instance</li>
+<li>InstancePerScope (InstancePerScopeLifetime): get always the same instance per scope</li>
+<li>InstancePerMatchingScope (InstancePerMatchingScopeLifetime): get the same instance per matching scope and child scopes.</li>
+</ul>
+<p>With <strong>Fluent Api</strong></p>
+<p><em>Singleton</em></p>
+<p>Examples:</p>
+<pre><code class="cs">injector.RegisterType&lt;MyItem&gt;().AsSingleton(); // type
+injector.RegisterFactory&lt;MyItem&gt;(() =&gt; new MyItem()).AsSingleton(); // factory
+// or
+injector.RegisterType(typeof(MyItem)).AsSingleton(); // type
+injector.RegisterFactory(typeof(MyItem), () =&gt; new MyItem()).AsSingleton(); // factory
+</code></pre>
+
+<p><em>InstancePerScope</em></p>
+<p>Examples:</p>
+<pre><code class="cs">injector.RegisterType&lt;MyItem&gt;().InstancePerScope(); // type
+injector.RegisterFactory&lt;MyItem&gt;(() =&gt; new MyItem()).InstancePerScope(); // factory
+// or
+injector.RegisterType(typeof(MyItem)).InstancePerScope(); // type
+injector.RegisterFactory(typeof(MyItem), () =&gt; new MyItem()).InstancePerScope(); // factory
+// or
+injector.RegisterScoped&lt;MyItem&gt;();
+injector.RegisterScoped&lt;MyItem&gt;(() =&gt; new MyItem());
+</code></pre>
+
+<p><em>InstancePerMatchingScope</em></p>
+<p>Examples:</p>
+<pre><code class="cs">injector.RegisterType&lt;MyItem&gt;().InstancePerMatchingScope(&quot;MyScope&quot;); // with the scope name to match
+// or
+injector.RegisterType(typeof(MyItem)).InstancePerMatchingScope(&quot;MyScope&quot;); // with the scope name to match
+</code></pre>
+
+<h2 id="registering-type-for-all-implemented-interfaces">Registering Type for all implemented interfaces<a class="headerlink" href="#registering-type-for-all-implemented-interfaces" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre><code class="cs">public interface ILookupDataServiceType1 { }
+
+public interface ILookupDataServiceType2 { }
+
+public interface ILookupDataServiceType3 { }
+
+public class LookupDataService : ILookupDataServiceType1, ILookupDataServiceType2, ILookupDataServiceType3 
+{ }
+</code></pre>
+
+<pre><code class="cs">var injector = new Injector();
+var options = injector.RegisterTypeForImplementedInterfaces&lt;LookupDataService&gt;();
+</code></pre>
+
+<p>... Avoid to do:</p>
+<pre><code class="cs">injector.RegisterTypeForImplementedInterfaces&lt;ILookupDataServiceType1, LookupDataService&gt;();
+injector.RegisterTypeForImplementedInterfaces&lt;ILookupDataServiceType2, LookupDataService&gt;();
+injector.RegisterTypeForImplementedInterfaces&lt;ILookupDataServiceType3, LookupDataService&gt;();
+</code></pre>
+
+<p>It's possible to change the lifetime for one registration </p>
+<pre><code class="cs">var options2 = options[typeof(ILookupDataServiceType2)];
+options2.AsSingleton();
+</code></pre>
+
+<h2 id="registering-singleton-for-all-implemented-interfaces">Registering Singleton for all implemented interfaces<a class="headerlink" href="#registering-singleton-for-all-implemented-interfaces" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Allows to get the same instance for all &quot;services&quot;.</p>
+<pre><code class="cs">var injector = new Injector();
+injector.RegisterSingletonForImplementedInterfaces&lt;LookupDataService&gt;();
+</code></pre>
+
+<h2 id="registering-scoped-for-all-implemented-interfaces">Registering Scoped for all implemented interfaces<a class="headerlink" href="#registering-scoped-for-all-implemented-interfaces" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Allows to get the same instance for all &quot;services&quot; by scope.</p>
+<pre><code class="cs">var injector = new Injector();
+injector.RegisterScopedForImplementedInterfaces&lt;LookupDataService&gt;();
+</code></pre>
+
+<h2 id="preferredimplementationattribute">PreferredImplementationAttribute<a class="headerlink" href="#preferredimplementationattribute" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The injector resolves not registered types for <strong>interfaces</strong>. For many implementations use the <strong>PreferredImplementationAttribute</strong> Example:</p>
+<pre><code class="cs">public interface IMyService
+{ }
+
+public class MyService1 : IMyService
+{ }
+
+[PreferredImplementation]
+public class MyService2 : IMyService
+{ }
+
+public class MyService3 : IMyService
+{ }
+</code></pre>
+
+<p>Change the option</p>
+<pre><code class="cs">var injector = new Injector(new ContainerOptions
+{
+    AutoDiscoveryOptions = new ScanOptions
+    {
+        MultipleImplementationTypeHandling = MultipleImplementationTypeHandling.PreferredImplementationAttribute
+    }
+});
+</code></pre>
+
+<p>Change the lifetime On discovery (Transcitent by default)</p>
+<pre><code class="cs">var injector = new Injector();
+injector.Context.AutoDiscoverer.LifetimeOnDiscovery = LifetimeOnDiscovery.Singleton;
+</code></pre>
+
+<p>Add additional types for resolution (for services registered in another assembly)</p>
+<pre><code class="cs">injector.Context.AutoDiscoverer.AdditionalTypes.AddRange(typeof(IService).Assembly.ExportedTypes); 
+</code></pre>
+
+<h2 id="injection-parameters">Injection Parameters<a class="headerlink" href="#injection-parameters" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>1 - Allow to provide values for value types, string, enumerables...</p>
+<p>Example</p>
+<pre><code class="cs">public class MyItem
+{
+    public MyItem(string myString, int myInt, List&lt;string&gt; myList)
+    {
+
+    }
+}
+</code></pre>
+
+<p>Inject values</p>
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterType&lt;MyItem&gt;()
+    .WithInjectionParameters(new InjectionParameter(&quot;myString&quot;, value: &quot;My value&quot;), 
+                             new InjectionParameter(&quot;myInt&quot;, value: 100), 
+                             new InjectionParameter(&quot;myList&quot;, value: new List&lt;string&gt; { &quot;A&quot;, &quot;B&quot; }));
+</code></pre>
+
+<p>2 - Other example allow to select a named registration</p>
+<pre><code class="cs">public class MyInnerItem { }
+
+public class MyItem
+{
+    public MyItem(MyInnerItem myInnerItem)
+    {
+
+    }
+}
+</code></pre>
+
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterType&lt;MyInnerItem&gt;(&quot;Key1&quot;); 
+
+injector.RegisterType&lt;MyItem&gt;()
+    .WithInjectionParameters(new InjectionParameter(&quot;myInnerItem&quot;, name: &quot;Key1&quot;)); // provide the name of the registration to use
+</code></pre>
+
+<p><em>Alternative with Dependency Attribute</em></p>
+<pre><code class="cs">public class MyInnerItem { }
+
+public class MyItem
+{
+    public MyItem([Dependency(Name =&quot;Key1&quot;)] MyInnerItem myInnerItem)
+    {
+
+    }
+}
+</code></pre>
+
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterType&lt;MyInnerItem&gt;(&quot;Key1&quot;); 
+
+injector.RegisterType&lt;MyItem&gt;();
+</code></pre>
+
+<h2 id="resolve">Resolve<a class="headerlink" href="#resolve" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre><code class="cs">var injector = new Injector();
+
+// resolve type, instance, factory ... with the lifetime
+var value = injector.Resolve(typeof(MyItem));
+var value = injector.Resolve(typeof(MyItem), &quot;MyName&quot;); // with name
+var value = injector.Resolve(typeof(IMyService)); 
+var value = injector.Resolve(typeof(IMyService), &quot;MyName&quot;); // with name
+</code></pre>
+
+<p>With extension methods</p>
+<pre><code class="cs">using MvvmLib.IoC;
+// ...
+
+var injector = new Injector();
+
+var value = injector.Resolve&lt;MyItem&gt;();
+var value = injector.Resolve&lt;MyItem&gt;(&quot;MyName&quot;); // with name
+var value = injector.Resolve&lt;IMyService&gt;();
+var value = injector.Resolve&lt;IMyService&gt;(&quot;MyName&quot;); // with name
+</code></pre>
+
+<p><em>InstancePerScope</em></p>
+<pre><code class="cs">var injector = new Injector();
+injector.RegisterScoped&lt;MyItem&gt;();
+
+using (var scope1 = injector.CreateScope())
+{
+    var instance1 = scope1.Resolve&lt;MyItem&gt;(); 
+    var instance2 = scope1.Resolve&lt;MyItem&gt;(); // instance1 equals instance2
+}
+
+using (var scope2 = injector.CreateScope())
+{
+    var instance3 = scope2.Resolve&lt;MyItem&gt;(); 
+    var instance4 = scope2.Resolve&lt;MyItem&gt;(); // instance3 equals instance4
+}
+</code></pre>
+
+<p>Named scope:</p>
+<pre><code class="cs">using (var scope1 = injector.CreateScope(&quot;MyScope&quot;))
+{
+}
+</code></pre>
+
+<p><em>InstancePerMatchingScope</em></p>
+<pre><code class="cs">var injector = new Injector();
+injector.RegisterType&lt;MyItem&gt;().InstancePerMatchingScope(&quot;MyScope&quot;);
+
+using (var scope = injector.CreateScope(&quot;MyScope&quot;))
+{
+    var instance1 = scope.Resolve&lt;MyItem&gt;();
+    using (var scope1 = scope.CreateScope())
+    {
+        var instance2 = scope1.Resolve&lt;MyItem&gt;();
+        using (var scope2 = scope1.CreateScope())
+        {
+            var instance3 = scope2.Resolve&lt;MyItem&gt;(); // instance1, instance2 and instance3 are equals
+        }
+    }
+}
+
+using (var scope = injector.CreateScope(&quot;MyScope&quot;))
+{
+    var instance4 = scope.Resolve&lt;MyItem&gt;();
+    using (var scope1 = scope.CreateScope())
+    {
+       var instance5 = scope1.Resolve&lt;MyItem&gt;(); // instance4 equals instance5 but instance1 (...) and instance4 (...) are not equals
+    }
+}
+</code></pre>
+
+<h2 id="func">Func<a class="headerlink" href="#func" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Sample 1</p>
+<pre><code class="cs">var injector = new Injector();
+var resolver = injector.Resolve&lt;Func&lt;MyItem&gt;&gt;();
+
+MyItem item = resolver();
+</code></pre>
+
+<p>Sample 2</p>
+<pre><code class="cs">public class MyItemWithFunc
+{
+    public MyItemWithFunc(Func&lt;MyItem&gt; resolver)
+    {
+        MyItem item = resolver();
+    }
+}
+</code></pre>
+
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterType&lt;MyItem&gt;();
+injector.RegisterType&lt;MyItemWithFunc&gt;();
+
+var instance = injector.Resolve&lt;MyItemWithFunc&gt;();
+</code></pre>
+
+<p>Sample 3</p>
+<p>With <code>Func&lt;string,T&gt;</code>. Useful for conditional resolution in the constructor.</p>
+<pre><code class="cs">var injector = new Injector();
+injector.RegisterType&lt;IMyService, MyService1&gt;(&quot;Key1&quot;);
+injector.RegisterType&lt;IMyService, MyService2&gt;(&quot;Key2&quot;);
+injector.RegisterType&lt;MyItem&gt;();
+
+var instance1 = injector.Resolve&lt;MyItem&gt;();
+</code></pre>
+
+<pre><code class="cs">public interface IMyService { }
+public class MyService1 : IMyService { }
+public class MyService2 : IMyService { }
+
+public class MyItem
+{
+    public MyItem(Func&lt;string, IMyService&gt; resolver)
+    {
+        var name = /* condition */ ? &quot;Key1&quot;: &quot;Key2&quot;;
+        var instance = resolver(name); // resolve by name
+    }
+}
+</code></pre>
+
+<h2 id="lazy">Lazy<a class="headerlink" href="#lazy" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Sample 1</p>
+<pre><code class="cs">var injector = new Injector();
+var lazy = injector.Resolve&lt;Lazy&lt;MyItem&gt;&gt;();
+
+MyItem item = lazy.Value;
+</code></pre>
+
+<p>Sample 2</p>
+<pre><code class="cs">public class MyItemWithFuncAndLazy
+{
+    public MyItemWithFuncAndLazy(Func&lt;MyItem&gt; func1, Lazy&lt;MyItem&gt; lazy1)
+    {
+        MyItem MyItem1 = func1();
+        MyItem MyItem2 = lazy1.Value;
+    }
+}
+</code></pre>
+
+<p>Note: dependency attribute and injection parameter are availables for constructor parameters with name. </p>
+<h2 id="property-injection">Property Injection<a class="headerlink" href="#property-injection" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>1 - define properties to include</p>
+<p><em>With InjectionProperty</em></p>
+<pre><code class="cs">var injector = new Injector();
+injector.RegisterType&lt;MyInnerItem&gt;();
+injector.RegisterType&lt;MyItem&gt;().WithInjectionProperties(new InjectionProperty(&quot;MyInner&quot;)); // propertyName
+
+var instance = injector.BuildUp&lt;MyItem&gt;();
+</code></pre>
+
+<p><em>Alternative with the Dependency Attribute</em></p>
+<pre><code class="cs">public class MyInnerItem { }
+
+public class MyItem
+{
+    public string MyString { get; set; } // not included
+
+    [Dependency]
+    public MyInnerItem MyInner { get; set; } // included
+}
+</code></pre>
+
+<p>2 - Provide a value with InjectionProperty</p>
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterType&lt;MyItem&gt;().WithInjectionProperties(new InjectionProperty(&quot;MyString&quot;, value: &quot;My value&quot;)); // propertyName, value
+
+var instance = injector.BuildUp&lt;MyItem&gt;();
+</code></pre>
+
+<pre><code class="cs">public class MyItem
+{
+    public string MyString { get; set; }
+}
+</code></pre>
+
+<p>3 - Provide the name the name of the registration to use</p>
+<p><em>With InjectionProperty</em></p>
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterType&lt;MyInnerItem&gt;(&quot;Key1&quot;);
+
+injector.RegisterType&lt;MyItem&gt;().WithInjectionProperties(new InjectionProperty(&quot;MyInner&quot;, name: &quot;Key1&quot;)); // propertyName, name
+
+var instance = injector.BuildUp&lt;MyItem&gt;();
+</code></pre>
+
+<pre><code class="cs">public class MyInnerItem { }
+
+public class MyItem
+{
+    public MyInnerItem MyInner { get; set; }
+}
+</code></pre>
+
+<p><em>Alternative with the Dependency Attribute</em></p>
+<pre><code class="cs">public class MyInnerItem { }
+
+public class MyItem
+{
+    [Dependency(Name =&quot;Key1&quot;)]
+    public MyInnerItem MyInner { get; set; }
+}
+</code></pre>
+
+<p>4 - BuildUp with an existing instance</p>
+<pre><code class="cs">var item = new MyItem();
+var instance = injector.BuildUp&lt;MyItem&gt;(item);
+</code></pre>
+
+<h2 id="onresolved-callback">OnResolved Callback<a class="headerlink" href="#onresolved-callback" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Allows to handle circular references for example.</p>
+<pre><code class="cs">public class CircularPropertyItem
+{
+    public CircularPropertyItem Item { get; set; } // circular reference
+
+    // other properties
+    public string MyString { get; set; }
+    public SubItem MySubItem { get; set; }
+}
+</code></pre>
+
+<pre><code class="cs">injector.RegisterType&lt;CircularPropertyItem&gt;().OnResolved((registration, instance) =&gt;
+{
+    var item = instance as CircularPropertyItem;
+    item.Item = item; // circular reference
+
+    // other properties
+    item.MyString = &quot;My value&quot;;
+    item.MySubItem = injector.Resolve&lt;SubItem&gt;();
+});
+
+var instance = injector.Resolve&lt;CircularPropertyItem&gt;();
+</code></pre>
+
+<h2 id="resolve-all">Resolve All<a class="headerlink" href="#resolve-all" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Resolves and returns all values for a type.</p>
+<p>Example:</p>
+<pre><code class="cs">var injector = new Injector();
+
+injector.RegisterInstance&lt;MyItem&gt;(new MyItem());
+injector.RegisterInstance&lt;MyItem&gt;(&quot;Key1&quot;, new MyItem());
+
+var items = injector.ResolveAll&lt;MyItem&gt;();
+</code></pre>
+
+<h2 id="autodiscovery">AutoDiscovery<a class="headerlink" href="#autodiscovery" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>By default, non registered types are resolved. To change this behavior:</p>
+<pre><code class="cs">injector.AutoDiscoverer.AutoDiscovery = false;
+</code></pre>
+
+<h2 id="nonpublicconstructors">NonPublicConstructors<a class="headerlink" href="#nonpublicconstructors" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>By default, non public constructors/ properties are found. To change this behavior:</p>
+<pre><code class="cs">var injector = new Injector(new ContainerOptions { NonPublicConstructors = false });
+</code></pre>
+
+<h2 id="preferredconstructorattribute">PreferredConstructorAttribute<a class="headerlink" href="#preferredconstructorattribute" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Example</p>
+<pre><code class="cs">public class MyViewModel
+{
+    public MyViewModel()
+    {
+
+    }
+
+    public MyViewModel(IMyService1 service1)
+    {
+
+    }
+
+    [PreferredConstructor]
+    public MyViewModel(IMyService1 service1, IMyService2 service2)
+    {
+
+    }
+}
+</code></pre>
+
+<h2 id="constructor-selector">Constructor Selector<a class="headerlink" href="#constructor-selector" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>It's possible to create a custom selector (for example a MostParametersConstructorSelector).</p>
+<pre><code class="cs">public class MyConstructorSelector : IConstructorSelector
+{
+    public ConstructorInfo ResolveConstructor(Type implementationType, bool nonPublic)
+    {
+        // implements ...
+    }
+}
+</code></pre>
+
+<pre><code class="cs">var injector = new Injector(new ContainerOptions { ConstructorSelector = new MyConstructorSelector() });
+</code></pre>
+
+<h2 id="delegatefactory">DelegateFactory<a class="headerlink" href="#delegatefactory" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The <strong>ExpressionDelegateFactory</strong> is used by <strong>default</strong> to create instances (with Expressions <strong>Linq</strong>).</p>
+<p>Change to ReflectionDelegateFactory (less performant)</p>
+<pre><code class="cs">var injector = new Injector(new ContainerOptions { DelegateFactory = new ReflectionDelegateFactory() });
+</code></pre>
+
+<p>Note: It's possible to create a custom DelegateFactory (implements IDelegateFactory interface). For example with <code>System.Reflection.Emit</code>. </p>
+<h2 id="interceptors">Interceptors<a class="headerlink" href="#interceptors" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Create an interceptor</p>
+<pre><code class="cs">public class MyInterceptor1 : InterceptorBase
+{
+    protected override Task Process(InterceptionContext input, Func&lt;InterceptionContext, bool, Task&gt; next)
+    {     
+        // do things before
+        next(input, true); // &lt;= Cancels next interceptors execution with false
+        // do things after
+        return Task.FromResult&lt;object&gt;(null);
+
+
+        // - or - 
+        // do things before
+        // return next(input, true);
+    }
+}
+</code></pre>
+
+<p>Register the interceptors</p>
+<pre><code class="cs">injector.RegisterType&lt;MyItem&gt;().WithInterceptors(new MyInterceptor1(), new MyInterceptor2()); // ...
+
+var instance = injector.Resolve&lt;MyItem&gt;(); // =&gt; interceptors executed
+</code></pre>
+
+<p>Note: the instance is resolved by the <strong>last interceptor</strong> (<code>ResolveInterceptor</code>). <code>input.Result</code> contains the instance <strong>after resolution</strong>. So at beginning the result is null, it's possible to provide the result and cancel next interceptors execution.</p>
+<p>Note 2: interceptors with MvvmLib.IoC are not invoked on method calls (unlike Unity for example).</p>
+<p><em>Async</em></p>
+<pre><code class="cs">public class MyInterceptor2 : InterceptorBase
+{
+    protected override async Task Process(InterceptionContext input, Func&lt;InterceptionContext, bool, Task&gt; next)
+    {
+        // do things before
+
+        await next(input, true);
+
+        // do things after
+    }
+}
+</code></pre>
+
+<h2 id="resolvers">Resolvers<a class="headerlink" href="#resolvers" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Default resolvers:</p>
+<ul>
+<li><strong>ValueResolver</strong>: for <code>ValueType</code> and <code>string</code>, returns default values</li>
+<li><strong>EnumerableTypeResolver</strong>: for <code>IEnumerable</code>, returns default values</li>
+<li><strong>FuncResolver</strong>: for <code>Func&lt;T&gt;</code></li>
+<li><strong>FuncWithNameResolver</strong>: for <code>Func&lt;string,T&gt;</code> used to resolve a type by name. Useful for conditional resolution in the constructor.</li>
+<li><strong>LazyResolver</strong>: for <code>Lazy&lt;T&gt;</code></li>
+<li><strong>TypeResolver</strong>: the default resolver used to resolve values for Types</li>
+</ul>
+<p>It's possible to create <strong>custom resolvers</strong></p>
+<pre><code class="cs">public class MyItemResolver : IValueResolver
+{
+    /// &lt;summary&gt;
+    /// Checks if a registration is required.
+    /// &lt;/summary&gt;
+    public bool RequireRegistration
+    {
+        get { return true; }
+    }
+
+    public bool CanResolve(Type type)
+    {
+        // used to determine if the resolver can be used
+        return type == typeof(MyItem);
+    }
+
+    public object Resolve(Type type, string name)
+    {
+        // the method used to resolve the value
+        return new MyItem();
+    }
+}
+</code></pre>
+
+<p>Register and use the custom resolver</p>
+<pre><code class="cs">var injector = new Injector();
+
+// register the custom resolver
+injector.RootScope.ResolverProvider.AddCustomResolver(new MyItemResolver());
+
+var item = injector.Resolve&lt;MyItem&gt;(); // the custom resolver is used
+</code></pre>
+
+<p>Note: the custom resolvers are copied on new scope creation.</p>
+<h2 id="events">Events<a class="headerlink" href="#events" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<ul>
+<li>Registering</li>
+<li>Registered</li>
+<li>Resolved</li>
+</ul>
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+MvvmLib Documentation - &copy; 2019. <a href='https://github.com/romagny13/MvvmLib' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/profiles/romagny13' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/modernizr-2.8.3.min.js"></script>
+    <script src="js/highlight.pack.js"></script>
+    <script src="js/theme.js"></script>
+
+</body>
+</html>

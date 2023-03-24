@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MvvmLib.Core - MvvmLib Documentation</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="css/styles/vs.css">
+    <link rel="stylesheet" href="css/font-awesome.4.5.0.min.css">
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="index.htm"><i class="fa fa-home"></i> MvvmLib Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="index.htm">Home</a>
+</li>
+
+<li class="tocentry current"><a class="current" href="MvvmLib.Core.htm">MvvmLib.Core</a>
+<ul class="currentrelative">
+<li class="tocentry"><a href="#commands">Commands</a></li>
+
+<li class="tocentry"><a href="#task-extensions">Task Extensions</a></li>
+
+<li class="tocentry"><a href="#mvvm">Mvvm</a></li>
+
+<li class="tocentry"><a href="#eventaggregator">EventAggregator</a></li>
+
+
+
+</ul>
+<li class="tocentry"><a href="MvvmLib.Wpf.htm">MvvmLib.Wpf</a>
+</li>
+<li class="tocentry"><a href="MvvmLib.IoC.htm">MvvmLib.IoC</a>
+</li>
+<li class="tocentry"><a href="MvvmLib.Scanning.htm">MvvmLib.Scanning</a>
+</li>
+<li class="tocentry"><a href="LICENSE.htm">LICENSE</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="index.htm">MvvmLib Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="index.htm">Home</a></li> / <li><a href="MvvmLib.Core.htm">MvvmLib.Core</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="mvvm.core">Mvvm.Core<a class="headerlink" href="#mvvm.core" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<ul>
+<li>Commands: <strong>DelegateCommand</strong>, <strong>AsyncCommand</strong> and <strong>CompositeCommand</strong></li>
+<li>Tsk Extensions: for <strong>Async</strong> with <strong>void method</strong></li>
+<li>Mvvm: <strong>BindableBase</strong>, <strong>Validatable</strong> and <strong>ModelWrapper</strong> base classes</li>
+<li><strong>EventAggregator</strong> : allows to <strong>subscribe</strong>, <strong>publish</strong> and filter messages</li>
+</ul>
+<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<h3 id="delegatecommand-and-delegatecommand">DelegateCommand and DelegateCommand<T><a class="headerlink" href="#delegatecommand-and-delegatecommand" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Example</p>
+<pre><code class="cs">private bool _canSave;
+public bool CanSave
+{
+    get { return _canSave; }
+    set
+    {
+        if (SetProperty(ref _canSave, value))
+            SaveCommand.RaiseCanExecuteChanged();
+    }
+}
+
+private DelegateCommand _saveCommand;
+public DelegateCommand SaveCommand =&gt;
+    _saveCommand ?? (_saveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand));
+
+private void ExecuteSaveCommand()
+{
+    // do something
+}
+</code></pre>
+
+<h3 id="asynccommand">AsyncCommand<a class="headerlink" href="#asynccommand" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Example</p>
+<pre><code class="cs">public class ShellViewModel : BindableBase
+{
+    private bool isBusy;
+    public bool IsBusy
+    {
+        get { return isBusy; }
+        set { SetProperty(ref isBusy, value); }
+    }
+
+    private IAsyncCommand myCommand;
+    public IAsyncCommand MyCommand
+    {
+        get
+        {
+            if (myCommand == null)
+                myCommand = new AsyncCommand(ExecuteMyCommand);
+            return myCommand;
+        }
+    }
+
+    private async Task ExecuteMyCommand()
+    {
+        IsBusy = true;
+
+        await Task.Delay(3000); // do some work
+
+        IsBusy = false;
+    }
+}
+</code></pre>
+
+<p>Supports cancellation:</p>
+<pre><code class="cs">myCommand.Cancel(); 
+// other sample 
+myCommand.CancellationTokenSource.CancelAfter(500);
+</code></pre>
+
+<p>Checks cancellation</p>
+<pre><code class="cs">if (myCommand.IsCancellationRequested)
+    return;
+</code></pre>
+
+<p>Handle exception</p>
+<pre><code class="cs">myCommand = new AsyncCommand(ExecuteMyCommand, ex =&gt; { });
+</code></pre>
+
+<h3 id="compositecommand">CompositeCommand<a class="headerlink" href="#compositecommand" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Example</p>
+<pre><code class="cs">public interface IApplicationCommands
+{
+    CompositeCommand SaveAllCommand { get; }
+}
+public class ApplicationCommands : IApplicationCommands
+{
+    public CompositeCommand SaveAllCommand { get; } = new CompositeCommand();
+}
+</code></pre>
+
+<p>Inject the application commands in ShellViewModel (and bind the SaveAllCommand in the View)</p>
+<pre><code class="cs">public class ShellViewModel
+{
+    public ShellViewModel(IApplicationCommands applicationCommands)
+    {
+        ApplicationCommands = applicationCommands;
+    }
+
+    public IApplicationCommands ApplicationCommands { get; }
+}
+</code></pre>
+
+<p>... Inject the application commands in other ViewModels and add commands to the composite command</p>
+<pre><code class="cs">public class TabViewModel : BindableBase
+{
+    private bool _canSave;
+    private string _updatedText;
+    private DelegateCommand _saveCommand;
+    private readonly IApplicationCommands _applicationCommands;
+
+    public TabViewModel(IApplicationCommands applicationCommands)
+    {
+        _applicationCommands = applicationCommands;
+        _applicationCommands.SaveAllCommand.Register(SaveCommand);
+    }
+
+    public string UpdatedText
+    {
+        get { return _updatedText; }
+        set { SetProperty(ref _updatedText, value); }
+    }
+
+    public bool CanSave
+    {
+        get { return _canSave; }
+        set
+        {
+            if (SetProperty(ref _canSave, value))
+                SaveCommand.RaiseCanExecuteChanged();
+        }
+    }
+
+    public DelegateCommand SaveCommand =&gt;
+        _saveCommand ?? (_saveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand));
+
+    private void ExecuteSaveCommand() =&gt;  UpdatedText = $&quot;Save {DateTime.Now}&quot;;
+}
+</code></pre>
+
+<p>The composite command can execute (all commands) only when each registered command can be executed.</p>
+<h2 id="task-extensions">Task Extensions<a class="headerlink" href="#task-extensions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<pre><code class="cs">// call a task from void method
+public void VoidMethod()
+{
+    DelayedTask().Await(completedCallback: () =&gt;
+    {
+      
+    });
+}
+
+public async Task DelayedTask()
+{
+    await Task.Delay(1000);
+}
+</code></pre>
+
+<p>It's possible to intercept exception with <code>errorCallback</code> and configure await to true (for the UIThread) with <code>continueOnCapturedContext</code> (false by default)</p>
+<h2 id="mvvm">Mvvm<a class="headerlink" href="#mvvm" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<h3 id="bindablebase">BindableBase<a class="headerlink" href="#bindablebase" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<blockquote>
+<p>Implements <em>INotifyPropertyChanged</em> interface.</p>
+</blockquote>
+<p>Allows to observe a property and notify the view that a value has changed.</p>
+<p>SetProperty</p>
+<pre><code class="cs">public class UserViewModel : BindableBase
+{
+    private string firstName;
+    public string FirstName
+    {
+        get { return firstName; }
+        set { SetProperty(ref firstName, value); }
+    }
+}
+</code></pre>
+
+<p>OnPropertyChanged</p>
+<pre><code class="cs">public class UserViewModel : BindableBase
+{
+    private string firstName;
+    public string FirstName
+    {
+        get { return firstName; }
+        set
+        {
+            SetProperty(ref firstName, value);
+            OnPropertyChanged(nameof(FullName));
+        }
+    }
+
+    private string lastName;
+    public string LastName
+    {
+        get { return lastName; }
+        set
+        {
+            SetProperty(ref lastName, value);
+            OnPropertyChanged(nameof(FullName));
+        }
+    }
+
+    public string FullName
+    {
+        get { return $&quot;{firstName} {LastName}&quot;; }
+    }
+}
+</code></pre>
+
+<p>Or with <strong>Linq</strong> Expression</p>
+<pre><code class="cs">public class User : BindableBase
+{
+
+    private string firstName;
+    public string FirstName
+    {
+        get { return firstName; }
+        set
+        {
+            firstName = value;
+            OnPropertyChanged(() =&gt; FirstName);
+        }
+    }
+}
+</code></pre>
+
+<h3 id="validatable">Validatable<a class="headerlink" href="#validatable" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<blockquote>
+<p>Validation + Edition</p>
+</blockquote>
+<p>Allows to <strong>validate</strong> the model with <strong>Data Annotations</strong> and <strong>custom validations</strong>.  </p>
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Validation Type</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>OnPropertyChange</td>
+	<td>Default. Validation on property changed</td>
+</tr>
+<tr>
+	<td>OnSubmit</td>
+	<td>Validation only after &quot;ValidateAll&quot; invoked. Validation on property changed only after &quot;ValidateAll&quot; invoked</td>
+</tr>
+<tr>
+	<td>Explicit</td>
+	<td>Validation only with &quot;ValidateProperty&quot; and &quot;ValidateAll&quot;</td>
+</tr>
+</tbody>
+</table>
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Property</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>UseDataAnnotations</td>
+	<td>Ignore or use Data Annotations for validation</td>
+</tr>
+<tr>
+	<td>UseCustomValidations</td>
+	<td>Ignore or use Custom validations</td>
+</tr>
+</tbody>
+</table>
+<table class="table table-bordered-all table-responsive">
+<thead>
+<tr>
+	<th>Method</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>ValidateProperty</td>
+	<td>Validate one property</td>
+</tr>
+<tr>
+	<td>ValidateAll</td>
+	<td>Validate all properties</td>
+</tr>
+<tr>
+	<td>Reset</td>
+	<td>Reset the errors and is submitted</td>
+</tr>
+</tbody>
+</table>
+<p>The model requires to use SetProperty</p>
+<pre><code class="cs">public class User : Validatable
+{
+    private string firstName;
+
+    [Required]
+    [StringLength(50)]
+    public string FirstName
+    {
+        get { return firstName; }
+        set { SetProperty(ref firstName, value); }
+    }
+
+    // object, list , etc.
+}
+</code></pre>
+
+<pre><code class="cs">var user = new User
+{
+    FirstName = &quot;Marie&quot;,
+    LastName = &quot;Bellin&quot;,
+    // etc.
+};
+
+
+// validate a property
+user.ValidateProperty(&quot;FirstName&quot;);
+
+// validate all
+user.ValidateAll();
+
+// summary
+var allErrors = user.GeErrorSummary();
+
+if (user.HasErrors)
+{ }
+
+// reset the errors and is submitted
+user.Reset();
+</code></pre>
+
+<h3 id="modelwrapper">ModelWrapper<a class="headerlink" href="#modelwrapper" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<blockquote>
+<p>Allows to wrap, edit and validate a model.</p>
+</blockquote>
+<p>The model does not require to use SetProperty</p>
+<pre><code class="cs">public class User
+{
+    public int Id { get; set; }
+
+    [Required]
+    [StringLength(50)]
+    public string FirstName { get; set; }
+
+    [StringLength(50)]
+    public string LastName { get; set; }
+
+    // object, list , etc.
+}
+</code></pre>
+
+<p>Create a Generic model wrapper class</p>
+<pre><code class="cs">public class UserWrapper : ModelWrapper&lt;User&gt;
+{
+    public UserWrapper(User model) : base(model)
+    {
+    }
+
+    public int Id { get { return Model.Id; } }
+
+    public string FirstName
+    {
+        get { return GetValue&lt;string&gt;(); }
+        set { SetValue(value); }
+    }
+
+    // etc.
+
+    // custom validations
+    protected override IEnumerable&lt;string&gt; ValidateCustom(string propertyName)
+    {
+        switch (propertyName)
+        {
+            case nameof(FirstName):
+                if (string.Equals(FirstName, &quot;Marie&quot;, StringComparison.OrdinalIgnoreCase))
+                {
+                    yield return &quot;Marie is not allowed&quot;;
+                }
+                break;
+        }
+    }
+}
+</code></pre>
+
+<p><strong>Wpf</strong></p>
+<p>Binding</p>
+<pre><code class="xml">&lt;!-- the default value of UpdateSourceTrigger is LostFocus --&gt;
+&lt;TextBox Text=&quot;{Binding User.FirstName, UpdateSourceTrigger=PropertyChanged}&quot; /&gt;
+</code></pre>
+
+<p>Create a Style that displays errors</p>
+<pre><code class="xml">&lt;Style TargetType=&quot;TextBox&quot;&gt;
+    &lt;Setter Property=&quot;Validation.ErrorTemplate&quot;&gt;
+        &lt;Setter.Value&gt;
+            &lt;ControlTemplate&gt;
+                &lt;StackPanel&gt;
+                    &lt;AdornedElementPlaceholder x:Name=&quot;placeholder&quot;/&gt;
+                    &lt;!--TextBlock with error --&gt;
+                    &lt;TextBlock FontSize=&quot;12&quot; Foreground=&quot;Red&quot; 
+                               Text=&quot;{Binding ElementName=placeholder,Path=AdornedElement.(Validation.Errors)[0].ErrorContent}&quot;/&gt;
+                &lt;/StackPanel&gt;
+            &lt;/ControlTemplate&gt;
+        &lt;/Setter.Value&gt;
+    &lt;/Setter&gt;
+    &lt;Style.Triggers&gt;
+        &lt;Trigger Property=&quot;Validation.HasError&quot; Value=&quot;True&quot;&gt;
+            &lt;Setter Property=&quot;Background&quot; Value=&quot;Red&quot;/&gt;
+            &lt;!--Tooltip with error --&gt;
+            &lt;Setter Property=&quot;ToolTip&quot; 
+                    Value=&quot;{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}&quot;/&gt;
+        &lt;/Trigger&gt;
+    &lt;/Style.Triggers&gt;
+&lt;/Style&gt;
+</code></pre>
+
+<p><strong>Uwp</strong></p>
+<pre><code class="xml">&lt;TextBox Text=&quot;{Binding User.FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}&quot; /&gt;
+&lt;TextBlock Text=&quot;{Binding User.Errors[FirstName][0]}&quot; Foreground=&quot;Red&quot;&gt;&lt;/TextBlock&gt;
+</code></pre>
+
+<p>Or Create a <em>Converter</em> that displays the <em>first error</em> of the list</p>
+<pre><code class="cs">public sealed class FirstErrorConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        var errors = value as IList&lt;string&gt;;
+        return errors != null &amp;&amp; errors.Count &gt; 0 ? errors.ElementAt(0) : null;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+</code></pre>
+
+<p>And use it</p>
+<pre><code class="xml">&lt;Page.Resources&gt;
+    &lt;converters:FirstErrorConverter x:Name=&quot;FirstErrorConverter&quot;&gt;&lt;/converters:FirstErrorConverter&gt;
+&lt;/Page.Resources&gt;
+</code></pre>
+
+<pre><code class="xml"> &lt;TextBox Text=&quot;{Binding User.FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}&quot; /&gt;
+&lt;!-- with converter --&gt;
+&lt;TextBlock Text=&quot;{Binding User.Errors[FirstName], Converter={StaticResource FirstErrorConverter}}&quot; Foreground=&quot;Red&quot;&gt;&lt;/TextBlock&gt;
+</code></pre>
+
+<h2 id="eventaggregator">EventAggregator<a class="headerlink" href="#eventaggregator" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<blockquote>
+<p>allows to subscribe, publish and filter messages</p>
+</blockquote>
+<p>Register the eventAggregator as singleton with an ioc container. </p>
+<pre><code class="cs">public class ShellViewModel
+{
+    public ShellViewModel(IEventAggregator eventAggregator)
+    { }
+}
+</code></pre>
+
+<p><strong>Subscribe</strong> and <strong>publish</strong> with empty event (no parameter)</p>
+<p>Create the event class</p>
+<pre><code class="cs">public class MyEvent : EventBase
+{ }
+</code></pre>
+
+<pre><code class="cs">// subscriber
+eventAggregator.GetEvent&lt;MyEvent&gt;().Subscribe(() =&gt; { /* do something with args.Message */ });
+</code></pre>
+
+<pre><code class="cs">// publisher
+eventAggregator.GetEvent&lt;MyEvent&gt;().Publish();
+</code></pre>
+
+<p><strong>Subscribe</strong> and <strong>publish</strong> with <code>parameter</code></p>
+<pre><code class="cs">public class DataSavedEvent : EventBase&lt;DataSavedEventArgs&gt;
+{ }
+
+public class DataSavedEventArgs
+{
+    public string Message { get; set; }
+}
+</code></pre>
+
+<pre><code class="cs">// subscriber
+eventAggregator.GetEvent&lt;DataSavedEvent&gt;().Subscribe(args =&gt; { /* do something with args.Message */ });
+</code></pre>
+
+<pre><code class="cs">// publisher
+eventAggregator.GetEvent&lt;DataSavedEvent&gt;().Publish(new DataSavedEventArgs { Message = &quot;Data saved.&quot; })
+</code></pre>
+
+<p><strong>Filter</strong></p>
+<p>Example: Filter on &quot;user id&quot;</p>
+<pre><code class="cs">eventAggregator.GetEvent&lt;MyUserEvent&gt;().Subscribe(user =&gt; { /* do something */ }).WithFilter(user =&gt; user.Id == 1); // &lt;= not notified
+
+messenger.GetEvent&lt;MyUserEvent&gt;().Publish(new User { Id = 2, UserName = &quot;Marie&quot; });  // &lt;=
+</code></pre>
+
+<p>The event class:</p>
+<pre><code class="cs">public class MyUserEvent : EventBase&lt;User&gt;
+{ }
+</code></pre>
+
+<p><strong>Execution strategy</strong>:</p>
+<ul>
+<li><strong>PublisherThread</strong> (default)</li>
+<li><strong>UIThread</strong></li>
+<li><strong>BackgroundThread</strong></li>
+</ul>
+<pre><code class="cs">eventAggregator.GetEvent&lt;DataSavedEvent&gt;().Subscribe(_ =&gt; { }).WithExecutionStrategy(ExecutionStrategyType.UIThread);
+</code></pre>
+
+<p><strong>Unsubscribe</strong> with the token received on subscription.</p>
+<pre><code class="cs">var subscriberOptions = eventAggregator.GetEvent&lt;DataSavedEvent&gt;().Subscribe(_ =&gt; { });
+
+var success = eventAggregator.GetEvent&lt;DataSavedEvent&gt;().Unsubscribe(subscriberOptions.Token);
+// or
+subscriberOptions.Unsubscribe();
+</code></pre>
+
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+MvvmLib Documentation - &copy; 2019. <a href='https://github.com/romagny13/MvvmLib' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/profiles/romagny13' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/modernizr-2.8.3.min.js"></script>
+    <script src="js/highlight.pack.js"></script>
+    <script src="js/theme.js"></script>
+
+</body>
+</html>

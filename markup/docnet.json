@@ -1,0 +1,15 @@
+{
+    "Name": "MvvmLib Documentation",
+    "Source": ".",
+    "Destination": "..\\docs",
+    "Theme": "Default",
+    "Footer": "MvvmLib Documentation - &copy; 2019. <a href='https://github.com/romagny13/MvvmLib' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/profiles/romagny13' target='_blank'>NuGet</a>.",
+    "Pages": {
+        "__index": "index.md",
+        "MvvmLib.Core": "MvvmLib.Core.md",
+        "MvvmLib.Wpf": "MvvmLib.Wpf.md",
+        "MvvmLib.IoC": "MvvmLib.IoC.md",
+        "MvvmLib.Scanning": "MvvmLib.Scanning.md",
+        "LICENSE": "LICENSE.md"
+    }
+}

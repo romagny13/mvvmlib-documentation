@@ -1,0 +1,701 @@
+# MvvmLib.Wpf
+
+* Mvvm: **ViewModelLocator**, **BindingProxy**, etc.
+* Navigation: **NavigationService**, **ConfigurableNavigationService**
+* Data: **ListCollectionViewEx**, **PagedList**, **PagedSource** and commands **ListCollectionViewCommands**, **PagedSourceCommands**
+* Interactivity: **Triggers**, **TriggerActions** and **Behaviors**: **EventTrigger**, **DataTrigger**, **CallMethodeAction**, **SelectorSelectedItemsSyncBehavior**, **EventToCommandBehavior**,**EventToMethodBehavior**, etc.
+* Controls: **AnimatingContentControl**, **TransitioningContentControl**, **TransitioningItemsControl**: allow to animate content. **NavigatableContentControl**
+* Expressions: allows to create filters with Linq expressions.
+* Common: **MvvmUtils**
+
+
+## ViewModelLocator
+
+> Allows to resolve ViewModels for Views with **AutoWireViewModel**. 
+
+Default **convention**:
+
+* Views in `Views` namespace
+* View models in `ViewModels` namespace
+* View model name: 
+    * _view name + "ViewModel"_ (example: ShellViewModel for Shell)
+    * Or if the view name ends by "View": _view name + "Model"_ (example: NavigationViewModel for NavigationView)
+
+### Change the convention
+
+Example with "View" and "ViewModel" namespaces
+
+```cs
+ViewModelLocationProvider.ChangeConvention((viewType) =>
+{
+  var viewFullName = viewType.FullName;
+  viewFullName = viewFullName.Replace(".View.", ".ViewModel."); // <= 
+  var suffix = viewFullName.EndsWith("View") ? "Model" : "ViewModel";
+  var viewModelFullName = string.Format(CultureInfo.InvariantCulture, "{0}{1}", viewFullName, suffix);
+  var viewModelType = viewType.Assembly.GetType(viewModelFullName);
+
+  return viewModelType;
+});
+```
+
+### Register a custom View Model for a view
+
+```cs
+ViewModelLocationProvider.Register<ShellViewModel, CustomViewModel>();
+```
+
+Or with factory
+
+
+```cs
+ViewModelLocationProvider.Register<ShellViewModel>(() => new CustomViewModel());
+```
+
+
+### AutoWireViewModel Attached property (Window, UserControl)
+
+Example:
+
+
+```xml
+<Window x:Class="Sample.Views.Shell"
+        ...
+         xmlns:ml="http://mvvmlib.com/"
+         ml:ViewModelLocator.AutoWireViewModel="True">
+```
+
+
+## BindingProxy
+
+Example:
+
+```xml
+<DataGrid x:Name="DataGrid1" ItemsSource="{Binding CollectionView}" AutoGenerateColumns="False" IsReadOnly="True">
+    <DataGrid.Resources>
+        <!-- 1. Adds the Proxy in control or window resources-->
+        <mvvmLib:BindingProxy x:Key="Proxy"  Data="{Binding}"/>
+    </DataGrid.Resources>
+    <DataGrid.Columns>
+        <DataGridTextColumn Binding="{Binding FirstName}" Width="*">
+            <DataGridTextColumn.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Name" />
+
+                    <local:DropDownButton Grid.Column="1">
+                        <local:DropDownButton.DropDownContent>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- code -->
+
+                                <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                    <!-- 2. Use the Proxy as Source and bind with The Data dependency property -->
+                                    <Button Content="Filter" Command="{Binding Data.FilterFirstNameCommand, Source={StaticResource Proxy}}" />
+                                </StackPanel>
+                            </Grid>
+                        </local:DropDownButton.DropDownContent>
+                    </local:DropDownButton>
+                </Grid>
+            </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+
+        <!-- other columns -->
+    </DataGrid.Columns>
+</DataGrid>
+```
+
+## Navigation
+
+### NavigationService
+
+Easy to use / customize, Mvvm support, injectable, etc.
+
+| Method | Description |
+| --- | --- |
+| Navigate | Navigation by Uri or uri string to a registered view (or viewmodel)
+| Replace| Allows to replace previous navigation entry
+| MoveTo | Move to index or content
+| MoveToFirst | Move to first page
+| MoveToLast | Move to last page
+| MoveToPrevious | Move to previous page
+| MoveToNext | Move to next page
+| Clear | clear history and content
+| Sync | Allows to sync with another navigation service
+
+| Property | Description |
+| --- | --- |
+| CanMoveToPrevious | Checks if can move to previous entry
+| CanMoveToNext | Checks if can move to next entry
+| Journal | The navigation journal
+
+| Event | Description |
+| --- | --- |
+| CanMoveToPreviousChanged | Raised when the value changed
+| CanMoveToNextChanged | Raised when the value changed
+| ContentChanged | Raised on content changed
+| Navigated | Raised on navigation end
+| Navigating | Raised at beginning of navigation
+| NavigationFailed | Raised on navigation failed (cancelled with activation guard for example)
+
+Note: 1 navigation service per UIElement (or use NavigationBehavior for custom behaviors)
+
+Bindable navigation service. Exemple with ContentControl
+
+```xml
+ <ContentControl Content="{Binding NavigationService.Content}"></ContentControl>
+```
+
+Register the navigation service with a IoC Container and inject in ViewModel
+
+```cs
+public class ShellViewModel
+{
+    public ShellViewModel(INavigationService navigationService)
+    {
+        NavigationService = navigationService;
+        NavigationCommands = new NavigationServiceCommands(NavigationService);
+        NavigationService.Navigate("HomeView");
+    }
+
+    public INavigationService NavigationService { get; }
+    public NavigationServiceCommands NavigationCommands { get; }
+}
+```
+Bind commands in view
+
+```xml
+<Button Command="{Binding NavigationCommands.MoveToFirstCommand}" Width="50">&lt;&lt;</Button>
+<Button Command="{Binding NavigationCommands.MoveToPreviousCommand}" Width="50" Content="&lt;"></Button>
+<Button Command="{Binding NavigationCommands.MoveToNextCommand}" Width="50" Content="&gt;"></Button>
+<Button Command="{Binding NavigationCommands.MoveToLastCommand}" Width="50">&gt;&gt;</Button>
+<Button Command="{Binding NavigationCommands.NavigateCommand}" CommandParameter="HomeView">Home</Button>
+<!-- with parameter -->
+<Button Command="{Binding NavigationCommands.NavigateCommand}" CommandParameter="ViewA?id=sample-id">View A (Guards)</Button>>
+```
+
+Replace: example remove LoginView from navigation journal
+
+```cs
+public class LoginViewModel : ISupportNavigation
+{
+    private readonly IAuth _auth;
+    private readonly INavigationService _navigationService;
+    private DelegateCommand _loginCommand;
+    private string _returnUrl;
+    private INavigateParameters _parameters;
+
+    public LoginViewModel(IAuth auth, INavigationService navigationService)
+    {
+        _auth = auth;
+        _navigationService = navigationService;
+    }
+
+    public DelegateCommand LoginCommand
+    {
+        get
+        {
+            if (_loginCommand == null)
+                _loginCommand = new DelegateCommand(Login);
+            return _loginCommand;
+        }
+    }
+
+    public bool IsNavigationTarget(NavigateContext context) => false;
+
+    public void OnNavigatedFrom(NavigateContext context) { }
+
+    public void OnNavigatedTo(NavigateContext context)
+    {
+        _returnUrl = context.Parameters.GetValue<string>("returnUrl");
+        _parameters = context.GetOriginalParameters();
+    }
+
+    private void Login()
+    {
+        _auth.Login();
+        _navigationService.Replace(_returnUrl, _parameters);
+    }
+}
+```
+
+Example: try to navigate to a protected resource and redirect to LoginView
+
+```cs
+public class ProtectedViewModel : BindableBase, ISupportNavigation, ISupportActivationGuard
+{
+    private readonly IAuth _auth;
+
+    public ProtectedViewModel(IAuth auth)
+    {
+        _auth = auth;
+    }
+
+    public bool IsNavigationTarget(NavigateContext context) => false;
+
+    public void OnNavigatedFrom(NavigateContext context)
+    { }
+
+    public void OnNavigatedTo(NavigateContext context)
+    {
+        var id = context.Parameters.GetValue<string>("id");
+        // etc.
+    }
+
+    public void CanActivate(NavigateContext context, Action<bool> continuationCallback)
+    {
+        if (!_auth.IsLogged)
+        {
+            context.NavigationService.Navigate("LoginView?returnUrl=ProtectedView", context.Parameters);
+            continuationCallback(false);
+        }
+        else
+            continuationCallback(true);
+    }
+}
+```
+
+### Registering views (and view models) for navigation
+
+#### ConfigurableNavigationService
+
+Easy to configure for navigation (do not require to use a bootstrapper)
+
+```cs
+var navigationService = new ConfigurableNavigationService
+{
+    PageAssociations = new Dictionary<string, Type>
+    {
+        { "HomeView", typeof(HomeView) },
+        { "ViewA", typeof(ViewA) },
+        // etc.
+    }
+};
+```
+
+Or use Scrutor to find and register all views of a namespace
+
+```cs
+var navigationService = new ConfigurableNavigationService();
+navigationService.RegisterViewsInExactNamespaceOf<Shell>(); // or RegisterViewsInNamespaceOf
+```
+
+#### NavigationService with a Bootstrapper
+
+Examples
+
+With `MvvmLib.Unity`
+
+```cs
+public class Bootstrapper : UnityBootstrapperBase
+{
+    protected override void RegisterTypes()
+    {
+        // Services
+        Container.RegisterSingleton<INavigationService, PrismNavigationService>();
+        Container.RegisterSingleton<IAuth, FakeAuth>();
+
+        // ViewModels
+        Container.RegisterForNavigation<ViewBViewModel>();
+        Container.RegisterViewModelsInExactNamespaceOf<ShellViewModel>();
+
+        // Register For Navigation
+        Container.RegisterForNavigationInNamespaceOf<Shell>(); // here
+    }
+
+    protected override Window CreateShell() => Container.Resolve<Shell>();
+}
+```
+
+
+With `MvvmLib.Microsoft.DependencyInjection.Extensions`
+
+```cs
+public class Bootstrapper : MicrosoftDependencyInjectionBootstrapperBase
+{
+    protected override void RegisterTypes()
+    {
+        // Services
+        Services.AddSingleton<INavigationService, PrismNavigationService>();
+        Services.AddSingleton<IAuth, FakeAuth>();
+        // ViewModels
+        Services.RegisterForNavigation<ViewBViewModel>();
+        Services.RegisterViewModelsInExactNamespaceOf<ShellViewModel>();
+
+        // Register For Navigation
+        Services.RegisterForNavigationInNamespaceOf<Shell>(); // here
+    }
+
+    protected override Window CreateShell() => ContainerLocator.Current.Resolve<Shell>();
+}
+```
+
+With `MvvmLib.IoC.Extensions`: all can be auto resolved
+
+```cs
+public class Bootstrapper : InjectorBootstrapperBase
+{
+    protected override void RegisterTypes()
+    {
+    }
+
+    protected override Window CreateShell() => ContainerLocator.Current.Resolve<Shell>();
+}
+```
+
+### Mvvm Support
+
+Navigation
+
+* ISupportNavigation: IsNavigationTarget to manage the view resolved, OnNavigatedFrom and OnNavigatedTo methods
+* ISupportJournal: to not persist a view in journal
+* ISupportLoaded with ViewModel.EnableLoaded attached property on a View
+* ISupportActivation: notified when a view is active/ selected
+
+Guards:
+
+* ISupportActivationGuard
+* ISupportDeactivationGuard
+
+
+Example confirm  navigation
+
+```cs
+public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivationGuard, ISupportDeactivationGuard
+{
+    // etc.
+
+    public void CanActivate(NavigateContext navigationContext, Action<bool> continuationCallback)
+    {
+        var can = MessageBox.Show($"Activate {nameof(ViewAViewModel)}?", "Confirmation", MessageBoxButton.OKCancel) == MessageBoxResult.OK;
+        continuationCallback(can);
+    }
+
+    public void CanDeactivate(NavigateContext navigationContext, Action<bool> continuationCallback)
+    {
+        var can = MessageBox.Show($"Deactivate {nameof(ViewAViewModel)}?", "Confirmation", MessageBoxButton.OKCancel) == MessageBoxResult.OK;
+        continuationCallback(can);
+    }
+
+    // returns always the same View/ViewModel if the pageKey of the uri is ViewA
+    public bool IsNavigationTarget(NavigateContext navigationContext) => navigationContext.PageKey == "ViewA";
+
+    public void OnNavigatedFrom(NavigateContext navigationContext)  { }
+
+    public void OnNavigatedTo(NavigateContext navigationContext)
+    {
+        var id = navigationContext.Parameters.GetValue<string>("id");
+    }
+}
+```
+
+### Easy to customize Navigation Service
+
+Example: replace to use Prism interfaces
+
+```cs
+public class PrismNavigationService : NavigationService
+{
+    #region Mvvm
+
+    protected override NavigateContext CreateContext(Uri uri, INavigateParameters parameters, NavigateMode mode)
+    {
+        var context = new PrismNavigateContext(uri, parameters, mode)
+        {
+            NavigationService = this
+        };
+        return context;
+    }
+
+    protected override void TryAutoWireViewModel(object content)
+    {
+        if (content is FrameworkElement view && view.DataContext is null && PrismViewModelLocator.GetAutoWireViewModel(view) is null)
+            PrismViewModelLocator.SetAutoWireViewModel(view, true);
+    }
+
+    protected override bool IsNavigationTarget(object content, NavigateContext context)
+    {
+        bool isNavigationTarget = false;
+        MvvmUtils.ViewAndViewModelAction<INavigationAware>(content, ina => { isNavigationTarget = ina.IsNavigationTarget(context.AsPrism()); });
+        return isNavigationTarget;
+    }
+
+    protected override void CanNavigate(object currentContent, object content, NavigateContext context, Action<bool> continuationCallback)
+    {
+        var callback = new Action<bool>(t =>
+        {
+            if (t == false)
+                continuationCallback(false);
+            else
+                continuationCallback(t);
+        });
+
+        if (currentContent is IConfirmNavigationRequest)
+            ((IConfirmNavigationRequest)currentContent).ConfirmNavigationRequest(context.AsPrism(), callback);
+        else if (currentContent is FrameworkElement element && element.DataContext is IConfirmNavigationRequest)
+            ((IConfirmNavigationRequest)element.DataContext).ConfirmNavigationRequest(context.AsPrism(), callback);
+        else
+            callback(true);
+    }
+
+    protected override bool PersistInJournal(object content)
+    {
+        bool persist = true;
+        MvvmHelpers.ViewAndViewModelAction<IJournalAware>(content, ija => { persist &= ija.PersistInHistory(); });
+        return persist;
+    }
+
+    protected override void SetActive(object content, bool isActive)
+    {
+        MvvmUtils.ViewAndViewModelAction<IActiveAware>(content, iaa => iaa.IsActive = isActive);
+    }
+
+    protected override void OnNavigatedFrom(object content, NavigateContext context)
+    {
+        MvvmUtils.ViewAndViewModelAction<INavigationAware>(content, x => x.OnNavigatedFrom(context.AsPrism()));
+    }
+
+    protected override void OnNavigatedTo(object content, NavigateContext context)
+    {
+        MvvmUtils.ViewAndViewModelAction<INavigationAware>(content, ina => ina.OnNavigatedTo(context.AsPrism()));
+    }
+
+    #endregion
+}
+
+public class PrismNavigateContext : NavigateContext
+{
+    public PrismNavigateContext(Uri uri, INavigateParameters parameters, NavigateMode mode) : base(uri, parameters, mode)
+    {
+        NavigationContext = CreatePrismNavigationContext();
+    }
+
+    private NavigationContext CreatePrismNavigationContext()
+    {
+        var parameters = Parameters.ToPrism();
+        var navigationContext = new MvvmLibNavigationContext(this, Uri, parameters);
+        return navigationContext;
+    }
+
+    public NavigationContext NavigationContext { get; }
+}
+
+public static class NavigateContextExtensions
+{
+    public static NavigationContext AsPrism(this NavigateContext navigateContext)
+    {
+        if (navigateContext is PrismNavigateContext prismNavigateContext)
+            return prismNavigateContext.NavigationContext;
+        return null;
+    }
+}
+
+public static class INavigateParametersExtensions
+{
+    public static NavigationParameters ToPrism(this INavigateParameters parameters)
+    {
+        var navigationParameters = new NavigationParameters();
+        foreach (var parameter in parameters)
+            navigationParameters.Add(parameter.Key, parameter.Value);
+        return navigationParameters;
+    }
+}
+
+public class MvvmLibNavigationContext : NavigationContext
+{
+    public MvvmLibNavigationContext(NavigateContext context, Uri uri, NavigationParameters navigationParameters)
+        : base(null, uri, navigationParameters)
+    {
+        Context = context;
+        GetNavigationParameters(navigationParameters);
+    }
+
+    public INavigationService MvvmLibNavigationService => Context.NavigationService;
+    public NavigateContext Context { get; }
+
+    private void GetNavigationParameters(NavigationParameters navigationParameters)
+    {
+        if (navigationParameters != null)
+        {
+            foreach (KeyValuePair<string, object> navigationParameter in navigationParameters)
+            {
+                Parameters.Add(navigationParameter.Key, navigationParameter.Value);
+            }
+        }
+    }
+}
+
+public static class NavigationContextExtensions
+{
+    public static T As<T>(this NavigationContext navigationContext) where T: NavigationContext
+    {
+        if (navigationContext is T objAsT)
+            return objAsT;
+        return default;
+    }
+}
+```
+
+## Create a custom Navigation Service
+
+Example with NavigationBehaviors and binding for Selectors (ListBox mutliple, TabControl, etc.)
+
+```cs
+public class CustomNavigationService : NavigationService, ICustomNavigationService
+{
+    INavigationJournal _journal;
+    private List<INavigationBehavior> _behaviors;
+
+    public CustomNavigationService()
+    {
+        Views = new ObservableCollection<object>();
+        ActiveViews = new ObservableCollection<object>();
+        _behaviors = new List<INavigationBehavior>();
+        _journal = new CustomJournal();
+    }
+
+    public ObservableCollection<object> Views { get; }
+    public ObservableCollection<object> ActiveViews { get; }
+
+    public override INavigationJournal Journal => _journal;
+
+    public IEnumerable<INavigationBehavior> Behaviors => _behaviors;
+
+    protected override void Activate(object content)
+    {
+        // single and multiple
+        if (Views.IndexOf(content) == -1)
+            Views.Insert(Journal.CurrentEntryIndex, content);
+
+        // multiple
+        if (ActiveViews.IndexOf(content) == -1)
+            ActiveViews.Insert(Journal.CurrentEntryIndex, content);
+
+        base.Activate(content);
+    }
+
+    public virtual void Attach(INavigationBehavior behavior)
+    {
+        if (behavior is null)
+            throw new ArgumentNullException(nameof(behavior));
+
+        behavior.NavigationService = this;
+        behavior.Attach();
+        _behaviors.Add(behavior);
+    }
+
+    public void Remove(object content)
+    {
+        base.Remove(content, r =>
+        {
+            // multiple
+            ActiveViews.Remove(content);
+
+            // single
+            Views.Remove(content);
+        });
+    }
+
+    public override void Clear()
+    {
+        Views.Clear();
+        ActiveViews.Clear();
+        base.Clear();
+    }
+}
+
+public class SyncStackPanelBehavior : NavigationBehavior<StackPanel>
+{
+    public SyncStackPanelBehavior(StackPanel associatedObject) : base(associatedObject)
+    {
+    }
+
+    protected CustomNavigationService CustomNavigationService => NavigationService as CustomNavigationService;
+
+    protected override void OnAttach()
+    {
+
+        CustomNavigationService.Views.CollectionChanged += (s, e) =>
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    {
+                        foreach (var item in e.NewItems)
+                        {
+                            if (item is FrameworkElement element)
+                            {
+                                if (TargetElement.Children.IndexOf(element) == -1)
+                                    TargetElement.Children.Add(EnsureNewView(element));
+                            }
+                        }
+                    }
+                    break;
+            }
+        };
+
+    }
+
+    protected virtual FrameworkElement EnsureNewView(object content)
+    {
+        if (content is FrameworkElement)
+        {
+            var newContent = ContainerLocator.Current.Resolve(content.GetType()) as FrameworkElement;
+            // if no AutoWireViewModel attached property on view or dataContext not defined at construction
+            MvvmUtils.TryAutoWireViewModel(newContent);
+            return newContent;
+        }
+        return null;
+    }
+
+    protected override void OnDetach()
+    { }
+}
+
+// Example: custom navigation journal: insert each entry at beginning
+public class CustomJournal : NavigationJournal
+{
+    protected override int GetNewEntryPosition() => 0;
+
+    protected override void RemoveEntries(int startIndex)
+    {
+        while (EntriesInternal.Count < startIndex)
+            EntriesInternal.RemoveAt(startIndex);
+    }
+}
+```
+
+Binding: Example ListBox Multiple
+
+```xml
+<ListBox ItemsSource="{Binding NavigationService.Views}" 
+            SelectionMode="Multiple"
+            SelectedItem="{Binding NavigationService.Content}"  
+            Grid.Row="1">
+    <ml:Interaction.Behaviors>
+        <ml:SelectorSelectedItemsSyncBehavior ActiveItems="{Binding NavigationService.ActiveViews}" />
+    </ml:Interaction.Behaviors>
+</ListBox>
+```
+
+Inject the navigation service in MainWindow to add the behavior
+
+```cs
+public partial class MainWindow : Window
+{
+    public MainWindow(ICustomNavigationService navigationService)
+    {
+        InitializeComponent();
+
+        navigationService.Attach(new SyncStackPanelBehavior(Panel));
+    }
+}
+```
+
