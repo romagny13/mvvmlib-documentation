@@ -1,7 +1,7 @@
 # Mvvm.Core
 
 * Commands: **DelegateCommand**, **AsyncCommand** and **CompositeCommand**
-* Tsk Extensions: for **Async** with **void method**
+* Task Extensions: for **Async** with **void method**
 * Mvvm: **BindableBase**, **Validatable** and **ModelWrapper** base classes
 * **EventAggregator** : allows to **subscribe**, **publish** and filter messages
 
