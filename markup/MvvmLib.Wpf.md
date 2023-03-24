@@ -384,7 +384,7 @@ ContainerLocator.SetContainerLocationProvider(() => new UnityContainerLocationPr
 Resolve a dependency
 
 ```cs
-ContainerLocator.Current.Resolve(typeof(Shell));
+var shell = ContainerLocator.Current.Resolve<Shell>();
 ```
 
 ### Mvvm Support

@@ -497,7 +497,7 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
 </code></pre>
 
 <p>Resolve a dependency</p>
-<pre><code class="cs">ContainerLocator.Current.Resolve(typeof(Shell));
+<pre><code class="cs">var shell = ContainerLocator.Current.Resolve&lt;Shell&gt;();
 </code></pre>
 
 <h3 id="mvvm-support">Mvvm Support<a class="headerlink" href="#mvvm-support" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
