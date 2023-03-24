@@ -95,7 +95,7 @@ public class ServiceB : IService
 { }
 
 // ...
-Scrutor.Default.Scan(scan =&gt; scan.FromAssemblyOf&lt;IService&gt;()).AsImplementedInterfaces(new ScanOptions
+var typeMaps = Scrutor.Default.Scan(scan =&gt; scan.FromAssemblyOf&lt;IService&gt;()).AsImplementedInterfaces(new ScanOptions
 {
     MultipleImplementationTypeHandling = MultipleImplementationTypeHandling.PreferredImplementationAttribute
 });

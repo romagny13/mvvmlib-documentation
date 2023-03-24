@@ -32,7 +32,7 @@ public class ServiceB : IService
 { }
 
 // ...
-Scrutor.Default.Scan(scan => scan.FromAssemblyOf<IService>()).AsImplementedInterfaces(new ScanOptions
+var typeMaps = Scrutor.Default.Scan(scan => scan.FromAssemblyOf<IService>()).AsImplementedInterfaces(new ScanOptions
 {
     MultipleImplementationTypeHandling = MultipleImplementationTypeHandling.PreferredImplementationAttribute
 });
