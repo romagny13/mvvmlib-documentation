@@ -342,6 +342,29 @@ public partial class App : Application
 }
 ```
 
+### Create a Login Screen or a SplashScreen
+
+```cs
+public class Bootstrapper : UnityBootstrapperBase
+{
+    // etc.
+    
+    protected override Window CreateShell() => Container.Resolve<Shell>();
+
+    protected override void ShowShell()
+    {
+        var window = new LoginOrSplashWindow();
+        if (window.ShowDialog() == true)
+            base.ShowShell();
+        else
+            Application.Current.Shutdown();
+    }
+}
+```
+
+Note: With a SplashScreenManager, `BeforeCreatingShell` method can be used.
+
+
 ## ContainerLocator
 
 Is used by MvvmLib to resolve all dependencies and is configured by the bootstrapper in background.
