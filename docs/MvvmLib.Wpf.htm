@@ -449,7 +449,7 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
 </code></pre>
 
 <h2 id="containerlocator">ContainerLocator<a class="headerlink" href="#containerlocator" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<p>Is used by MvvmLib to resolve all dependencies and configured by the bootstrapper in background.</p>
+<p>Is used by MvvmLib to resolve all dependencies and is configured by the bootstrapper in background.</p>
 <p>Manually (without Bootstrapper), example with Unity:</p>
 <pre><code class="cs">// Container is IUnityContainer
 ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocationProvider(Container))

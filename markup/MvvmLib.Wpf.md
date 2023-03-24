@@ -331,7 +331,7 @@ public partial class App : Application
 
 ## ContainerLocator
 
-Is used by MvvmLib to resolve all dependencies and configured by the bootstrapper in background.
+Is used by MvvmLib to resolve all dependencies and is configured by the bootstrapper in background.
 
 Manually (without Bootstrapper), example with Unity:
 
