@@ -1242,11 +1242,6 @@ SelectorSelectedItemsSyncBehavior
     <ml:Interaction.Behaviors>
         <ml:SelectorSelectedItemsSyncBehavior ActiveItems="{Binding SelectedUsers}"/>
     </ml:Interaction.Behaviors>
-    <ListBox.ItemTemplate>
-        <DataTemplate>
-            <TextBlock Text="{Binding Name}" />
-        </DataTemplate>
-    </ListBox.ItemTemplate>
 </ListBox>
 ```
 
@@ -1258,17 +1253,11 @@ TreeViewSelectedItemChangedBehavior
         <HierarchicalDataTemplate DataType="{x:Type viewModels:Family}" ItemsSource="{Binding Members}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding Name}" />
-                <TextBlock Text=" [" Foreground="Blue" />
-                <TextBlock Text="{Binding Members.Count}" Foreground="Blue" />
-                <TextBlock Text="]" Foreground="Blue" />
             </StackPanel>
         </HierarchicalDataTemplate>
         <DataTemplate DataType="{x:Type viewModels:FamilyMember}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding Name}" />
-                <TextBlock Text=" (" Foreground="Green" />
-                <TextBlock Text="{Binding Age}" Foreground="Green" />
-                <TextBlock Text=" years)" Foreground="Green" />
             </StackPanel>
         </DataTemplate>
     </TreeView.Resources>
