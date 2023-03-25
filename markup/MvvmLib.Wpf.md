@@ -41,14 +41,14 @@ ViewModelLocationProvider.ChangeConvention((viewType) =>
 ### Register a custom View Model for a view
 
 ```cs
-ViewModelLocationProvider.Register<ShellViewModel, CustomViewModel>();
+ViewModelLocationProvider.Register<ShellView, CustomViewModel>();
 ```
 
 Or with factory
 
 
 ```cs
-ViewModelLocationProvider.Register<ShellViewModel>(() => new CustomViewModel());
+ViewModelLocationProvider.Register<ShellView>(() => new CustomViewModel());
 ```
 
 
