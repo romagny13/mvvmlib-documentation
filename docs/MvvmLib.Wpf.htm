@@ -528,7 +528,7 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
         continuationCallback(can);
     }
 
-    // returns always the same View/ViewModel if the pageKey of the uri is View (Usefull for Master Details Scenario for example)
+    // returns always the same View/ViewModel if the pageKey of the uri is View
     public bool IsNavigationTarget(NavigateContext context) =&gt; context.PageKey == &quot;ViewA&quot;;
 
     public void OnNavigatedFrom(NavigateContext context)  { }

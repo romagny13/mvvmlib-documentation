@@ -414,7 +414,7 @@ public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivati
         continuationCallback(can);
     }
 
-    // returns always the same View/ViewModel if the pageKey of the uri is View (Usefull for Master Details Scenario for example)
+    // returns always the same View/ViewModel if the pageKey of the uri is View
     public bool IsNavigationTarget(NavigateContext context) => context.PageKey == "ViewA";
 
     public void OnNavigatedFrom(NavigateContext context)  { }
