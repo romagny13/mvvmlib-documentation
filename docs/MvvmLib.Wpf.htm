@@ -101,14 +101,14 @@
 </ul>
 <h2 id="viewmodellocator">ViewModelLocator<a class="headerlink" href="#viewmodellocator" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <blockquote>
-<p>Allows to resolve ViewModels for Views with <strong>AutoWireViewModel</strong>. </p>
+<p>Allows to resolve ViewModels for Views with <strong>AutoWireViewModel</strong>.</p>
 </blockquote>
 <p>Default <strong>convention</strong>:</p>
 <ul>
 <li>Views in <code>Views</code> namespace</li>
 <li>View models in <code>ViewModels</code> namespace</li>
 <li>
-View model name: 
+View model name:
 <ul>
 <li><em>view name + &quot;ViewModel&quot;</em> (example: ShellViewModel for Shell)</li>
 <li>Or if the view name ends by &quot;View&quot;: <em>view name + &quot;Model&quot;</em> (example: NavigationViewModel for NavigationView)</li>
@@ -120,7 +120,7 @@ View model name:
 <pre><code class="cs">ViewModelLocationProvider.ChangeConvention((viewType) =&gt;
 {
   var viewFullName = viewType.FullName;
-  viewFullName = viewFullName.Replace(&quot;.View.&quot;, &quot;.ViewModel.&quot;); // &lt;= 
+  viewFullName = viewFullName.Replace(&quot;.View.&quot;, &quot;.ViewModel.&quot;); // &lt;=
   var suffix = viewFullName.EndsWith(&quot;View&quot;) ? &quot;Model&quot; : &quot;ViewModel&quot;;
   var viewModelFullName = string.Format(CultureInfo.InvariantCulture, &quot;{0}{1}&quot;, viewFullName, suffix);
   var viewModelType = viewType.Assembly.GetType(viewModelFullName);
@@ -282,7 +282,7 @@ View model name:
 
 <p>In code</p>
 <pre><code class="cs">NavigationService.Navigate(&quot;ViewA&quot;);
-// With parameters 
+// With parameters
 NavigationService.Navigate(&quot;ViewA&quot;, new NavigateParameters
 {
     { &quot;id&quot;, 10 }
@@ -453,7 +453,7 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
              xmlns:local=&quot;clr-namespace:WpfApp1&quot;
              Startup=&quot;Application_Startup&quot;&gt;
     &lt;Application.Resources&gt;
-         
+
     &lt;/Application.Resources&gt;
 &lt;/Application&gt;
 </code></pre>
@@ -472,7 +472,7 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
 <pre><code class="cs">public class Bootstrapper : UnityBootstrapperBase
 {
     // etc.
-    
+
     protected override Window CreateShell() =&gt; Container.Resolve&lt;Shell&gt;();
 
     protected override void ShowShell()
@@ -511,7 +511,7 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
 <li>ISupportActivationGuard</li>
 <li>ISupportDeactivationGuard</li>
 </ul>
-<p>Example confirm  navigation</p>
+<p>Example confirm navigation</p>
 <pre><code class="cs">public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivationGuard, ISupportDeactivationGuard
 {
     // etc.
@@ -537,6 +537,27 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
     {
         var id = context.Parameters.GetValue&lt;string&gt;(&quot;id&quot;);
     }
+}
+</code></pre>
+
+<p><code>IsNavigationTarget</code>: Master Details Scenario Sample</p>
+<pre><code class="cs">public class UserDetailsViewModel : BindableBase, ISupportNavigation
+{
+    private User _user;
+    public User User
+    {
+        get { return _user; }
+        set { SetProperty(ref _user, value); }
+    }
+
+    public bool IsNavigationTarget(NavigateContext navigationContext)
+    {
+        if (navigationContext.Parameters.TryGetValue&lt;int&gt;(&quot;id&quot;, out var id))
+            return id == User.Id;
+        return false;
+    }
+
+    // etc.
 }
 </code></pre>
 
@@ -821,9 +842,9 @@ public class CustomJournal : NavigationJournal
 </code></pre>
 
 <p>Binding: Example ListBox Multiple</p>
-<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding NavigationService.Views}&quot; 
+<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding NavigationService.Views}&quot;
             SelectionMode=&quot;Multiple&quot;
-            SelectedItem=&quot;{Binding NavigationService.Content}&quot;  
+            SelectedItem=&quot;{Binding NavigationService.Content}&quot;
             Grid.Row=&quot;1&quot;&gt;
     &lt;ml:Interaction.Behaviors&gt;
         &lt;ml:SelectorSelectedItemsSyncBehavior ActiveItems=&quot;{Binding NavigationService.ActiveViews}&quot; /&gt;
@@ -1048,11 +1069,11 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <h2 id="controls">Controls<a class="headerlink" href="#controls" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <h3 id="animatingcontentcontrol">AnimatingContentControl<a class="headerlink" href="#animatingcontentcontrol" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <blockquote>
-<p>Content Control that allows to animate on content change. </p>
+<p>Content Control that allows to animate on content change.</p>
 </blockquote>
-<p>2 Storyboards : </p>
+<p>2 Storyboards :</p>
 <ul>
-<li>EntranceAnimation </li>
+<li>EntranceAnimation</li>
 <li>ExitAnimation</li>
 <li>Simultaneous (boolean) allows to play simultaneously the animations.</li>
 <li>CanAnimateOnLoad: allows to cancel animation on load</li>
@@ -1061,7 +1082,7 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
     &lt;ml:AnimatingContentControl.EntranceAnimation&gt;
         &lt;Storyboard&gt;
             &lt;!-- Target &quot;CurrentContentPresenter&quot;  --&gt;
-            &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot; 
+            &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot;
                              Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
                              From=&quot;400&quot; To=&quot;0&quot; Duration=&quot;0:0:0.4&quot;  /&gt;
         &lt;/Storyboard&gt;
@@ -1069,7 +1090,7 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
     &lt;ml:AnimatingContentControl.ExitAnimation&gt;
         &lt;Storyboard&gt;
             &lt;!-- Target &quot;CurrentContentPresenter&quot; or with Simultaneous &quot;PreviousContentPresenter&quot; --&gt;
-            &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot; 
+            &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot;
                              Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
                              From=&quot;0&quot; To=&quot;400&quot; Duration=&quot;0:0:0.4&quot;  /&gt;
         &lt;/Storyboard&gt;
@@ -1078,14 +1099,14 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 </code></pre>
 
 <p>Or Simultaneous</p>
-<pre><code class="xml">  &lt;ml:AnimatingContentControl Content=&quot;{Binding Navigation.Current}&quot; 
+<pre><code class="xml">  &lt;ml:AnimatingContentControl Content=&quot;{Binding Navigation.Current}&quot;
                                     Simultaneous=&quot;True&quot;
                                     IsCancelled=&quot;{Binding IsCancelled}&quot;&gt;
     &lt;ml:AnimatingContentControl.EntranceAnimation&gt;
         &lt;Storyboard&gt;
             &lt;DoubleAnimation  Storyboard.TargetName=&quot;CurrentContentPresenter&quot;
                                 Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
-                                From=&quot;{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}&quot; To=&quot;0&quot; 
+                                From=&quot;{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}&quot; To=&quot;0&quot;
                                 Duration=&quot;{Binding ElementName=DuractionComboBox,Path=SelectedItem}&quot;&gt;
                 &lt;DoubleAnimation.EasingFunction&gt;
                     &lt;SineEase EasingMode=&quot;EaseInOut&quot; /&gt;
@@ -1097,7 +1118,7 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
         &lt;Storyboard&gt;
             &lt;DoubleAnimation  Storyboard.TargetName=&quot;PreviousContentPresenter&quot;
                                 Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
-                                From=&quot;0&quot; To=&quot;{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}&quot; 
+                                From=&quot;0&quot; To=&quot;{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}&quot;
                                 Duration=&quot;{Binding ElementName=DuractionComboBox,Path=SelectedItem}&quot;&gt;
                 &lt;DoubleAnimation.EasingFunction&gt;
                     &lt;SineEase EasingMode=&quot;EaseInOut&quot; /&gt;
@@ -1111,28 +1132,28 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <p>Other sample: animations in resources</p>
 <pre><code class="xml">&lt;UserControl.Resources&gt;
     &lt;Storyboard x:Key=&quot;EntranceAnimation1&quot;&gt;
-        &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot; 
+        &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot;
                          Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
                          From=&quot;400&quot; To=&quot;0&quot; Duration=&quot;0:0:0.4&quot;  /&gt;
     &lt;/Storyboard&gt;
 
     &lt;Storyboard x:Key=&quot;ExitAnimation1&quot;&gt;
-        &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot; 
+        &lt;DoubleAnimation Storyboard.TargetName=&quot;CurrentContentPresenter&quot;
                          Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)&quot;
                          From=&quot;0&quot; To=&quot;-400&quot; Duration=&quot;0:0:0.4&quot;  /&gt;
     &lt;/Storyboard&gt;
 &lt;/UserControl.Resources&gt;
 </code></pre>
 
-<pre><code class="xml">&lt;ml:AnimatingContentControl Content=&quot;{Binding Navigation.Current}&quot; 
+<pre><code class="xml">&lt;ml:AnimatingContentControl Content=&quot;{Binding Navigation.Current}&quot;
                                  EntranceAnimation=&quot;{StaticResource EntranceAnimation1}&quot;
                                  ExitAnimation=&quot;{StaticResource ExitAnimation1}&quot;&gt;
 &lt;/ml:AnimatingContentControl&gt;
 </code></pre>
 
 <p>Other sample: Change Animations dynamically and controlling when the animation is played with &quot;CanAnimate&quot;. For a Schedule view for example.</p>
-<pre><code class="xml">&lt;ml:AnimatingContentControl  Content=&quot;{Binding Navigation.Current}&quot; 
-                                  CanAnimate=&quot;{Binding CanAnimate, Mode=OneWay}&quot; 
+<pre><code class="xml">&lt;ml:AnimatingContentControl  Content=&quot;{Binding Navigation.Current}&quot;
+                                  CanAnimate=&quot;{Binding CanAnimate, Mode=OneWay}&quot;
                                   CanAnimateOnLoad=&quot;False&quot;
                                   EntranceAnimation=&quot;{Binding EntranceAnimation, Mode=OneWay}&quot;
                                   ExitAnimation=&quot;{Binding ExitAnimation, Mode=OneWay}&quot;&gt;
@@ -1163,8 +1184,8 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <pre><code class="xml">&lt;ml:TransitioningContentControl x:Name=&quot;TransitioningContentControl1&quot; Margin=&quot;0,20&quot;&gt;
         &lt;ml:TransitioningContentControl.EntranceTransition&gt;
             &lt;Storyboard&gt;
-                &lt;DoubleAnimation Storyboard.TargetName=&quot;ContentPresenter&quot; 
-                                    Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)&quot; 
+                &lt;DoubleAnimation Storyboard.TargetName=&quot;ContentPresenter&quot;
+                                    Storyboard.TargetProperty=&quot;(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)&quot;
                                     From=&quot;0&quot; To=&quot;1&quot; Duration=&quot;0:0:0.6&quot;&gt;
                     &lt;DoubleAnimation.EasingFunction&gt;
                         &lt;ExponentialEase EasingMode=&quot;EaseInOut&quot;/&gt;
@@ -1174,8 +1195,8 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
         &lt;/ml:TransitioningContentControl.EntranceTransition&gt;
         &lt;ml:TransitioningContentControl.ExitTransition&gt;
             &lt;Storyboard&gt;
-                &lt;DoubleAnimation Storyboard.TargetName=&quot;ContentPresenter&quot; 
-                                    Storyboard.TargetProperty=&quot;(UIElement.Opacity)&quot; 
+                &lt;DoubleAnimation Storyboard.TargetName=&quot;ContentPresenter&quot;
+                                    Storyboard.TargetProperty=&quot;(UIElement.Opacity)&quot;
                                     From=&quot;1&quot; To=&quot;0&quot; Duration=&quot;0:0:2&quot;/&gt;
             &lt;/Storyboard&gt;
 &lt;/ml:TransitioningContentControl.ExitTransition&gt;
@@ -1183,10 +1204,10 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 
 <h3 id="transitioningitemscontrol">TransitioningItemsControl<a class="headerlink" href="#transitioningitemscontrol" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <blockquote>
-<p>ItemsControl that allows to animate on item insertion and deletion. </p>
+<p>ItemsControl that allows to animate on item insertion and deletion.</p>
 </blockquote>
 <p>The &quot;ControlledAnimation&quot; avoid to set the target and the target property of the storyboard. The TargetPropertyType is a shortcut. But it's possible to target explicitly the target property of the storyboard with &quot;TargetProperty&quot; dependency property.</p>
-<pre><code class="xml">&lt;ml:TransitioningItemsControl ItemsSource=&quot;{Binding MyItems}&quot; 
+<pre><code class="xml">&lt;ml:TransitioningItemsControl ItemsSource=&quot;{Binding MyItems}&quot;
                                    TransitionClearHandling=&quot;Transition&quot;
                                    IsCancelled=&quot;{Binding IsCancelled}&quot;&gt;
     &lt;ml:TransitioningItemsControl.EntranceAnimation&gt;
@@ -1210,7 +1231,7 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 </code></pre>
 
 <h3 id="navigatablecontentcontrol">NavigatableContentControl<a class="headerlink" href="#navigatablecontentcontrol" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>It's a control that allows to use navigation service méthods (like a Frame). </p>
+<p>It's a control that allows to use navigation service méthods (like a Frame).</p>
 <p>Example with mahApps.Metro, sets the content of the <a href="https://mahapps.com/docs/controls/HamburgerMenu" target="_blank">HamburgerMenu</a></p>
 <pre><code class="cs">public partial class Shell
 {
@@ -1280,7 +1301,7 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 </code></pre>
 
 <p>SelectorSelectedItemsSyncBehavior</p>
-<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding Users}&quot; 
+<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding Users}&quot;
             SelectionMode=&quot;Multiple&quot;
             SelectedItem=&quot;{Binding SelectedUser}&quot;
             MinHeight=&quot;100&quot;&gt;
@@ -1290,7 +1311,7 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 &lt;/ListBox&gt;
 </code></pre>
 
-<p>TreeViewSelectedItemChangedBehavior </p>
+<p>TreeViewSelectedItemChangedBehavior</p>
 <pre><code class="xml">&lt;TreeView ItemsSource=&quot;{Binding Families}&quot; MinHeight=&quot;100&quot;&gt;
     &lt;TreeView.Resources&gt;
         &lt;HierarchicalDataTemplate DataType=&quot;{x:Type viewModels:Family}&quot; ItemsSource=&quot;{Binding Members}&quot;&gt;
@@ -1305,8 +1326,8 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
         &lt;/DataTemplate&gt;
     &lt;/TreeView.Resources&gt;
     &lt;ml:Interaction.Behaviors&gt;
-        &lt;ml:TreeViewSelectedItemChangedBehavior 
-            ExpandSelected=&quot;True&quot; 
+        &lt;ml:TreeViewSelectedItemChangedBehavior
+            ExpandSelected=&quot;True&quot;
             SelectedItem=&quot;{Binding ActiveFamilyOrMember}&quot; /&gt;
     &lt;/ml:Interaction.Behaviors&gt;
 &lt;/TreeView&gt;

@@ -1,25 +1,24 @@
 # MvvmLib.Wpf
 
-* Mvvm: **ViewModelLocator**, **BindingProxy**, etc.
-* Navigation: **NavigationService**, **ConfigurableNavigationService**
-* Data: **ListCollectionViewEx**, **PagedList**, **PagedSource** and commands **ListCollectionViewCommands**, **PagedSourceCommands**
-* Interactivity: **CallMethodAction**, **SelectorSelectedItemsSyncBehavior**, **EventToCommandBehavior**, etc.
-* Controls: **AnimatingContentControl**, **TransitioningContentControl**, **TransitioningItemsControl**: allow to animate content. **NavigatableContentControl**
-* Expressions: allows to create filters with Linq expressions.
-* Common: **MvvmUtils**
-
+- Mvvm: **ViewModelLocator**, **BindingProxy**, etc.
+- Navigation: **NavigationService**, **ConfigurableNavigationService**
+- Data: **ListCollectionViewEx**, **PagedList**, **PagedSource** and commands **ListCollectionViewCommands**, **PagedSourceCommands**
+- Interactivity: **CallMethodAction**, **SelectorSelectedItemsSyncBehavior**, **EventToCommandBehavior**, etc.
+- Controls: **AnimatingContentControl**, **TransitioningContentControl**, **TransitioningItemsControl**: allow to animate content. **NavigatableContentControl**
+- Expressions: allows to create filters with Linq expressions.
+- Common: **MvvmUtils**
 
 ## ViewModelLocator
 
-> Allows to resolve ViewModels for Views with **AutoWireViewModel**. 
+> Allows to resolve ViewModels for Views with **AutoWireViewModel**.
 
 Default **convention**:
 
-* Views in `Views` namespace
-* View models in `ViewModels` namespace
-* View model name: 
-    * _view name + "ViewModel"_ (example: ShellViewModel for Shell)
-    * Or if the view name ends by "View": _view name + "Model"_ (example: NavigationViewModel for NavigationView)
+- Views in `Views` namespace
+- View models in `ViewModels` namespace
+- View model name:
+  - _view name + "ViewModel"_ (example: ShellViewModel for Shell)
+  - Or if the view name ends by "View": _view name + "Model"_ (example: NavigationViewModel for NavigationView)
 
 ### Change the convention
 
@@ -29,7 +28,7 @@ Example with "View" and "ViewModel" namespaces
 ViewModelLocationProvider.ChangeConvention((viewType) =>
 {
   var viewFullName = viewType.FullName;
-  viewFullName = viewFullName.Replace(".View.", ".ViewModel."); // <= 
+  viewFullName = viewFullName.Replace(".View.", ".ViewModel."); // <=
   var suffix = viewFullName.EndsWith("View") ? "Model" : "ViewModel";
   var viewModelFullName = string.Format(CultureInfo.InvariantCulture, "{0}{1}", viewFullName, suffix);
   var viewModelType = viewType.Assembly.GetType(viewModelFullName);
@@ -46,16 +45,13 @@ ViewModelLocationProvider.Register<Shell, CustomViewModel>();
 
 Or with factory
 
-
 ```cs
 ViewModelLocationProvider.Register<Shell>(() => new CustomViewModel());
 ```
 
-
 ### AutoWireViewModel Attached property (Window, UserControl)
 
 Example:
-
 
 ```xml
 <Window x:Class="Sample.Views.Shell"
@@ -64,39 +60,38 @@ Example:
          ml:ViewModelLocator.AutoWireViewModel="True">
 ```
 
-
 ## Navigation
 
 ### NavigationService
 
 Easy to use / customize, Mvvm support, injectable, etc.
 
-| Method | Description |
-| --- | --- |
-| Navigate | Navigation by Uri or uri string to a registered view (or viewmodel)
-| Replace| Allows to replace previous navigation entry
-| MoveTo | Move to index or content
-| MoveToFirst | Move to first page
-| MoveToLast | Move to last page
-| MoveToPrevious | Move to previous page
-| MoveToNext | Move to next page
-| Clear | clear history and content
-| Sync | Allows to sync with another navigation service
+| Method         | Description                                                         |
+| -------------- | ------------------------------------------------------------------- |
+| Navigate       | Navigation by Uri or uri string to a registered view (or viewmodel) |
+| Replace        | Allows to replace previous navigation entry                         |
+| MoveTo         | Move to index or content                                            |
+| MoveToFirst    | Move to first page                                                  |
+| MoveToLast     | Move to last page                                                   |
+| MoveToPrevious | Move to previous page                                               |
+| MoveToNext     | Move to next page                                                   |
+| Clear          | clear history and content                                           |
+| Sync           | Allows to sync with another navigation service                      |
 
-| Property | Description |
-| --- | --- |
-| CanMoveToPrevious | Checks if can move to previous entry
-| CanMoveToNext | Checks if can move to next entry
-| Journal | The navigation journal
+| Property          | Description                          |
+| ----------------- | ------------------------------------ |
+| CanMoveToPrevious | Checks if can move to previous entry |
+| CanMoveToNext     | Checks if can move to next entry     |
+| Journal           | The navigation journal               |
 
-| Event | Description |
-| --- | --- |
-| CanMoveToPreviousChanged | Raised when the value changed
-| CanMoveToNextChanged | Raised when the value changed
-| ContentChanged | Raised on content changed
-| Navigated | Raised on navigation end
-| Navigating | Raised at beginning of navigation
-| NavigationFailed | Raised on navigation failed (cancelled with activation guard for example)
+| Event                    | Description                                                               |
+| ------------------------ | ------------------------------------------------------------------------- |
+| CanMoveToPreviousChanged | Raised when the value changed                                             |
+| CanMoveToNextChanged     | Raised when the value changed                                             |
+| ContentChanged           | Raised on content changed                                                 |
+| Navigated                | Raised on navigation end                                                  |
+| Navigating               | Raised at beginning of navigation                                         |
+| NavigationFailed         | Raised on navigation failed (cancelled with activation guard for example) |
 
 Note: 1 navigation service per UIElement (or use NavigationBehavior for custom behaviors)
 
@@ -122,6 +117,7 @@ public class ShellViewModel
     public NavigationServiceCommands NavigationCommands { get; }
 }
 ```
+
 Bind commands in view
 
 ```xml
@@ -138,7 +134,7 @@ In code
 
 ```cs
 NavigationService.Navigate("ViewA");
-// With parameters 
+// With parameters
 NavigationService.Navigate("ViewA", new NavigateParameters
 {
     { "id", 10 }
@@ -285,7 +281,6 @@ public class Bootstrapper : UnityBootstrapperBase
 }
 ```
 
-
 With `MvvmLib.Microsoft.DependencyInjection.Extensions`
 
 ```cs
@@ -330,7 +325,7 @@ App.xaml: Replace StartupUri by Startup event
              xmlns:local="clr-namespace:WpfApp1"
              Startup="Application_Startup">
     <Application.Resources>
-         
+
     </Application.Resources>
 </Application>
 ```
@@ -353,7 +348,7 @@ public partial class App : Application
 public class Bootstrapper : UnityBootstrapperBase
 {
     // etc.
-    
+
     protected override Window CreateShell() => Container.Resolve<Shell>();
 
     protected override void ShowShell()
@@ -368,7 +363,6 @@ public class Bootstrapper : UnityBootstrapperBase
 ```
 
 Note: With a SplashScreenManager, `BeforeCreatingShell` method can be used.
-
 
 ## ContainerLocator
 
@@ -391,18 +385,17 @@ var shell = ContainerLocator.Current.Resolve<Shell>();
 
 Navigation
 
-* ISupportNavigation: IsNavigationTarget to manage the view resolved, OnNavigatedFrom and OnNavigatedTo methods
-* ISupportJournal: to not persist a view in journal
-* ISupportLoaded with ViewModel.EnableLoaded attached property on a View
-* ISupportActivation: notified when a view is active/ selected
+- ISupportNavigation: IsNavigationTarget to manage the view resolved, OnNavigatedFrom and OnNavigatedTo methods
+- ISupportJournal: to not persist a view in journal
+- ISupportLoaded with ViewModel.EnableLoaded attached property on a View
+- ISupportActivation: notified when a view is active/ selected
 
 Guards:
 
-* ISupportActivationGuard
-* ISupportDeactivationGuard
+- ISupportActivationGuard
+- ISupportDeactivationGuard
 
-
-Example confirm  navigation
+Example confirm navigation
 
 ```cs
 public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivationGuard, ISupportDeactivationGuard
@@ -433,6 +426,29 @@ public class ViewAViewModel : BindableBase, ISupportNavigation, ISupportActivati
 }
 ```
 
+`IsNavigationTarget`: Master Details Scenario Sample
+
+```cs
+public class UserDetailsViewModel : BindableBase, ISupportNavigation
+{
+    private User _user;
+    public User User
+    {
+        get { return _user; }
+        set { SetProperty(ref _user, value); }
+    }
+
+    public bool IsNavigationTarget(NavigateContext navigationContext)
+    {
+        if (navigationContext.Parameters.TryGetValue<int>("id", out var id))
+            return id == User.Id;
+        return false;
+    }
+
+    // etc.
+}
+```
+
 ### Handle Loaded from ViewModel
 
 Add the `EnabledLoaded` attached property on the View
@@ -455,7 +471,6 @@ public class ShellViewModel : ISupportLoaded
     }
 }
 ```
-
 
 ## Change the Mvvm interfaces used by the Navigation Service
 
@@ -728,9 +743,9 @@ public class CustomJournal : NavigationJournal
 Binding: Example ListBox Multiple
 
 ```xml
-<ListBox ItemsSource="{Binding NavigationService.Views}" 
+<ListBox ItemsSource="{Binding NavigationService.Views}"
             SelectionMode="Multiple"
-            SelectedItem="{Binding NavigationService.Content}"  
+            SelectedItem="{Binding NavigationService.Content}"
             Grid.Row="1">
     <ml:Interaction.Behaviors>
         <ml:SelectorSelectedItemsSyncBehavior ActiveItems="{Binding NavigationService.ActiveViews}" />
@@ -916,7 +931,6 @@ Binding
 
 ### PagedSource
 
-
 ```cs
 public class PagedSourceViewModel : BindableBase
 {
@@ -961,31 +975,31 @@ Binding
 
 It's possible to create a `DataPager` and the methods of the PagedSource
 
-* MoveToFirstPage
-* MoveToPreviousPage
-* MoveToNextPage
-* MoveToLastPage
-* MoveToPage
+- MoveToFirstPage
+- MoveToPreviousPage
+- MoveToNextPage
+- MoveToLastPage
+- MoveToPage
 
 ## Controls
 
 ### AnimatingContentControl
 
-> Content Control that allows to animate on content change. 
+> Content Control that allows to animate on content change.
 
-2 Storyboards : 
+2 Storyboards :
 
-* EntranceAnimation 
-* ExitAnimation
-* Simultaneous (boolean) allows to play simultaneously the animations.
-* CanAnimateOnLoad: allows to cancel animation on load
+- EntranceAnimation
+- ExitAnimation
+- Simultaneous (boolean) allows to play simultaneously the animations.
+- CanAnimateOnLoad: allows to cancel animation on load
 
 ```xml
 <ml:AnimatingContentControl ml:NavigationManager.SourceName="Main">
     <ml:AnimatingContentControl.EntranceAnimation>
         <Storyboard>
             <!-- Target "CurrentContentPresenter"  -->
-            <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
+            <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter"
                              Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
                              From="400" To="0" Duration="0:0:0.4"  />
         </Storyboard>
@@ -993,7 +1007,7 @@ It's possible to create a `DataPager` and the methods of the PagedSource
     <ml:AnimatingContentControl.ExitAnimation>
         <Storyboard>
             <!-- Target "CurrentContentPresenter" or with Simultaneous "PreviousContentPresenter" -->
-            <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
+            <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter"
                              Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
                              From="0" To="400" Duration="0:0:0.4"  />
         </Storyboard>
@@ -1004,14 +1018,14 @@ It's possible to create a `DataPager` and the methods of the PagedSource
 Or Simultaneous
 
 ```xml
-  <ml:AnimatingContentControl Content="{Binding Navigation.Current}" 
+  <ml:AnimatingContentControl Content="{Binding Navigation.Current}"
                                     Simultaneous="True"
                                     IsCancelled="{Binding IsCancelled}">
     <ml:AnimatingContentControl.EntranceAnimation>
         <Storyboard>
             <DoubleAnimation  Storyboard.TargetName="CurrentContentPresenter"
                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
-                                From="{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}" To="0" 
+                                From="{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}" To="0"
                                 Duration="{Binding ElementName=DuractionComboBox,Path=SelectedItem}">
                 <DoubleAnimation.EasingFunction>
                     <SineEase EasingMode="EaseInOut" />
@@ -1023,7 +1037,7 @@ Or Simultaneous
         <Storyboard>
             <DoubleAnimation  Storyboard.TargetName="PreviousContentPresenter"
                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
-                                From="0" To="{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}" 
+                                From="0" To="{Binding ElementName=ThisControl,Path=ActualWidth,FallbackValue=400}"
                                 Duration="{Binding ElementName=DuractionComboBox,Path=SelectedItem}">
                 <DoubleAnimation.EasingFunction>
                     <SineEase EasingMode="EaseInOut" />
@@ -1036,17 +1050,16 @@ Or Simultaneous
 
 Other sample: animations in resources
 
-
 ```xml
 <UserControl.Resources>
     <Storyboard x:Key="EntranceAnimation1">
-        <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
+        <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter"
                          Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
                          From="400" To="0" Duration="0:0:0.4"  />
     </Storyboard>
 
     <Storyboard x:Key="ExitAnimation1">
-        <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter" 
+        <DoubleAnimation Storyboard.TargetName="CurrentContentPresenter"
                          Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
                          From="0" To="-400" Duration="0:0:0.4"  />
     </Storyboard>
@@ -1054,7 +1067,7 @@ Other sample: animations in resources
 ```
 
 ```xml
-<ml:AnimatingContentControl Content="{Binding Navigation.Current}" 
+<ml:AnimatingContentControl Content="{Binding Navigation.Current}"
                                  EntranceAnimation="{StaticResource EntranceAnimation1}"
                                  ExitAnimation="{StaticResource ExitAnimation1}">
 </ml:AnimatingContentControl>
@@ -1063,8 +1076,8 @@ Other sample: animations in resources
 Other sample: Change Animations dynamically and controlling when the animation is played with "CanAnimate". For a Schedule view for example.
 
 ```xml
-<ml:AnimatingContentControl  Content="{Binding Navigation.Current}" 
-                                  CanAnimate="{Binding CanAnimate, Mode=OneWay}" 
+<ml:AnimatingContentControl  Content="{Binding Navigation.Current}"
+                                  CanAnimate="{Binding CanAnimate, Mode=OneWay}"
                                   CanAnimateOnLoad="False"
                                   EntranceAnimation="{Binding EntranceAnimation, Mode=OneWay}"
                                   ExitAnimation="{Binding ExitAnimation, Mode=OneWay}">
@@ -1078,27 +1091,26 @@ Other sample: Change Animations dynamically and controlling when the animation i
 </ml:AnimatingContentControl>
 ```
 
-
 ### TransitioningContentControl
 
 > Allows to play a transition on loaded.
 
 2 Storyboards:
 
-* EntranceTransition: played when control loaded (or explicitly with "DoEnter")
-* ExitTransition: played explicitly with "DoLeave" or IsLeaving dependency property (for example played when the user click on a tab close button)
+- EntranceTransition: played when control loaded (or explicitly with "DoEnter")
+- ExitTransition: played explicitly with "DoLeave" or IsLeaving dependency property (for example played when the user click on a tab close button)
 
 Other methods:
 
-* CancelTransition
-* Reset: reset the render transform property and opacity + cancel transition
+- CancelTransition
+- Reset: reset the render transform property and opacity + cancel transition
 
 ```xml
 <ml:TransitioningContentControl x:Name="TransitioningContentControl1" Margin="0,20">
         <ml:TransitioningContentControl.EntranceTransition>
             <Storyboard>
-                <DoubleAnimation Storyboard.TargetName="ContentPresenter" 
-                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" 
+                <DoubleAnimation Storyboard.TargetName="ContentPresenter"
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)"
                                     From="0" To="1" Duration="0:0:0.6">
                     <DoubleAnimation.EasingFunction>
                         <ExponentialEase EasingMode="EaseInOut"/>
@@ -1108,8 +1120,8 @@ Other methods:
         </ml:TransitioningContentControl.EntranceTransition>
         <ml:TransitioningContentControl.ExitTransition>
             <Storyboard>
-                <DoubleAnimation Storyboard.TargetName="ContentPresenter" 
-                                    Storyboard.TargetProperty="(UIElement.Opacity)" 
+                <DoubleAnimation Storyboard.TargetName="ContentPresenter"
+                                    Storyboard.TargetProperty="(UIElement.Opacity)"
                                     From="1" To="0" Duration="0:0:2"/>
             </Storyboard>
 </ml:TransitioningContentControl.ExitTransition>
@@ -1117,12 +1129,12 @@ Other methods:
 
 ### TransitioningItemsControl
 
-> ItemsControl that allows to animate on item insertion and deletion. 
+> ItemsControl that allows to animate on item insertion and deletion.
 
 The "ControlledAnimation" avoid to set the target and the target property of the storyboard. The TargetPropertyType is a shortcut. But it's possible to target explicitly the target property of the storyboard with "TargetProperty" dependency property.
 
 ```xml
-<ml:TransitioningItemsControl ItemsSource="{Binding MyItems}" 
+<ml:TransitioningItemsControl ItemsSource="{Binding MyItems}"
                                    TransitionClearHandling="Transition"
                                    IsCancelled="{Binding IsCancelled}">
     <ml:TransitioningItemsControl.EntranceAnimation>
@@ -1147,7 +1159,7 @@ The "ControlledAnimation" avoid to set the target and the target property of the
 
 ### NavigatableContentControl
 
-It's a control that allows to use navigation service méthods (like a Frame). 
+It's a control that allows to use navigation service méthods (like a Frame).
 
 Example with mahApps.Metro, sets the content of the <a href="https://mahapps.com/docs/controls/HamburgerMenu" target="_blank">HamburgerMenu</a>
 
@@ -1207,15 +1219,15 @@ DataTrigger
 
 Triggers:
 
-* EventTrigger
-* DataTrigger
+- EventTrigger
+- DataTrigger
 
 TriggerActions:
 
-* CallMethodAction
-* InvokeCommandAction
-* ChangePropertyAction
-* GoToStateAction
+- CallMethodAction
+- InvokeCommandAction
+- ChangePropertyAction
+- GoToStateAction
 
 It's possible to create custom Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).
 
@@ -1233,9 +1245,8 @@ EventToCommandBehavior
 
 SelectorSelectedItemsSyncBehavior
 
-
 ```xml
-<ListBox ItemsSource="{Binding Users}" 
+<ListBox ItemsSource="{Binding Users}"
             SelectionMode="Multiple"
             SelectedItem="{Binding SelectedUser}"
             MinHeight="100">
@@ -1245,7 +1256,7 @@ SelectorSelectedItemsSyncBehavior
 </ListBox>
 ```
 
-TreeViewSelectedItemChangedBehavior 
+TreeViewSelectedItemChangedBehavior
 
 ```xml
 <TreeView ItemsSource="{Binding Families}" MinHeight="100">
@@ -1262,8 +1273,8 @@ TreeViewSelectedItemChangedBehavior
         </DataTemplate>
     </TreeView.Resources>
     <ml:Interaction.Behaviors>
-        <ml:TreeViewSelectedItemChangedBehavior 
-            ExpandSelected="True" 
+        <ml:TreeViewSelectedItemChangedBehavior
+            ExpandSelected="True"
             SelectedItem="{Binding ActiveFamilyOrMember}" />
     </ml:Interaction.Behaviors>
 </TreeView>
