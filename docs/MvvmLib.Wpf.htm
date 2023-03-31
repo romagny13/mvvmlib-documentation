@@ -550,9 +550,9 @@ ContainerLocator.SetContainerLocationProvider(() =&gt; new UnityContainerLocatio
         set { SetProperty(ref _user, value); }
     }
 
-    public bool IsNavigationTarget(NavigateContext navigationContext)
+    public bool IsNavigationTarget(NavigateContext context)
     {
-        if (navigationContext.Parameters.TryGetValue&lt;int&gt;(&quot;id&quot;, out var id))
+        if (context.Parameters.TryGetValue&lt;int&gt;(&quot;id&quot;, out var id))
             return id == User.Id;
         return false;
     }

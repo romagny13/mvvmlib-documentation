@@ -438,9 +438,9 @@ public class UserDetailsViewModel : BindableBase, ISupportNavigation
         set { SetProperty(ref _user, value); }
     }
 
-    public bool IsNavigationTarget(NavigateContext navigationContext)
+    public bool IsNavigationTarget(NavigateContext context)
     {
-        if (navigationContext.Parameters.TryGetValue<int>("id", out var id))
+        if (context.Parameters.TryGetValue<int>("id", out var id))
             return id == User.Id;
         return false;
     }
