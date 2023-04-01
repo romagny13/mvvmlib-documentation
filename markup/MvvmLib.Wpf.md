@@ -1312,6 +1312,86 @@ TriggerActions:
 
 It's possible to create custom Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).
 
+### Create a custom TriggerAction
+
+Example: for closing TabItem
+
+```cs
+public class CloseTabAction : TriggerAction<Button>
+{
+    protected override void Invoke(object parameter)
+    {
+        var args = parameter as RoutedEventArgs;
+        if (args == null)
+            return;
+
+        var tabItem = XamlTreeHelper.FindParent<TabItem>((DependencyObject)args.OriginalSource);
+        if (tabItem == null)
+            return;
+
+        var tabControl = XamlTreeHelper.FindParent<TabControl>(tabItem);
+        if (tabControl == null)
+            return;
+
+        var view = tabItem.Content as UserDetailsView; 
+        ((MainWindowViewModel)tabControl.DataContext).NavigationService.Remove(view);
+    }
+}
+
+public class XamlTreeHelper
+{
+    public static T FindParent<T>(DependencyObject child) where T : DependencyObject
+    {
+        DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+
+        if (parentObject == null)
+            return null;
+
+        var parent = parentObject as T;
+        if (parent != null)
+            return parent;
+
+        return FindParent<T>(parentObject);
+    }
+}
+```
+
+Add the trigger to the TabItem implicit Style
+
+```xml
+<Style TargetType="TabItem">
+    <Setter Property="Header" Value="{Binding DataContext.Name}"/>
+    <Setter Property="HeaderTemplate">
+        <Setter.Value>
+            <DataTemplate>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ContentControl Content="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,7,0" />
+                    <Button Content="X" 
+                            HorizontalAlignment="Right" Height="20" Width="20" Padding="0"
+                            Grid.Column="1">
+                        <ml:Interaction.Triggers>
+                            <ml:EventTrigger EventName="Click">
+                                <local:CloseTabAction />
+                            </ml:EventTrigger>
+                        </ml:Interaction.Triggers>
+                    </Button>
+                </Grid>
+            </DataTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
+```
+
+And the TabControl: ItemsSource binded to the Views of a Custom NavigationService
+
+```xml
+<TabControl ItemsSource="{Binding NavigationService.Views}"></TabControl>
+```
+
 ### Behaviors
 
 EventToCommandBehavior

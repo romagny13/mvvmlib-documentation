@@ -1362,6 +1362,79 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 <li>GoToStateAction</li>
 </ul>
 <p>It's possible to create custom Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).</p>
+<h3 id="create-a-custom-triggeraction">Create a custom TriggerAction<a class="headerlink" href="#create-a-custom-triggeraction" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Example: for closing TabItem</p>
+<pre><code class="cs">public class CloseTabAction : TriggerAction&lt;Button&gt;
+{
+    protected override void Invoke(object parameter)
+    {
+        var args = parameter as RoutedEventArgs;
+        if (args == null)
+            return;
+
+        var tabItem = XamlTreeHelper.FindParent&lt;TabItem&gt;((DependencyObject)args.OriginalSource);
+        if (tabItem == null)
+            return;
+
+        var tabControl = XamlTreeHelper.FindParent&lt;TabControl&gt;(tabItem);
+        if (tabControl == null)
+            return;
+
+        var view = tabItem.Content as UserDetailsView; 
+        ((MainWindowViewModel)tabControl.DataContext).NavigationService.Remove(view);
+    }
+}
+
+public class XamlTreeHelper
+{
+    public static T FindParent&lt;T&gt;(DependencyObject child) where T : DependencyObject
+    {
+        DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+
+        if (parentObject == null)
+            return null;
+
+        var parent = parentObject as T;
+        if (parent != null)
+            return parent;
+
+        return FindParent&lt;T&gt;(parentObject);
+    }
+}
+</code></pre>
+
+<p>Add the trigger to the TabItem implicit Style</p>
+<pre><code class="xml">&lt;Style TargetType=&quot;TabItem&quot;&gt;
+    &lt;Setter Property=&quot;Header&quot; Value=&quot;{Binding DataContext.Name}&quot;/&gt;
+    &lt;Setter Property=&quot;HeaderTemplate&quot;&gt;
+        &lt;Setter.Value&gt;
+            &lt;DataTemplate&gt;
+                &lt;Grid&gt;
+                    &lt;Grid.ColumnDefinitions&gt;
+                        &lt;ColumnDefinition /&gt;
+                        &lt;ColumnDefinition /&gt;
+                    &lt;/Grid.ColumnDefinitions&gt;
+                    &lt;ContentControl Content=&quot;{Binding}&quot; VerticalAlignment=&quot;Center&quot; HorizontalAlignment=&quot;Center&quot; Margin=&quot;0,0,7,0&quot; /&gt;
+                    &lt;Button Content=&quot;X&quot; 
+                            HorizontalAlignment=&quot;Right&quot; Height=&quot;20&quot; Width=&quot;20&quot; Padding=&quot;0&quot;
+                            Grid.Column=&quot;1&quot;&gt;
+                        &lt;ml:Interaction.Triggers&gt;
+                            &lt;ml:EventTrigger EventName=&quot;Click&quot;&gt;
+                                &lt;local:CloseTabAction /&gt;
+                            &lt;/ml:EventTrigger&gt;
+                        &lt;/ml:Interaction.Triggers&gt;
+                    &lt;/Button&gt;
+                &lt;/Grid&gt;
+            &lt;/DataTemplate&gt;
+        &lt;/Setter.Value&gt;
+    &lt;/Setter&gt;
+&lt;/Style&gt;
+</code></pre>
+
+<p>And the TabControl: ItemsSource binded to the Views of a Custom NavigationService</p>
+<pre><code class="xml">&lt;TabControl ItemsSource=&quot;{Binding NavigationService.Views}&quot;&gt;&lt;/TabControl&gt;
+</code></pre>
+
 <h3 id="behaviors">Behaviors<a class="headerlink" href="#behaviors" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>EventToCommandBehavior</p>
 <pre><code class="xml">&lt;Button Content=&quot;Click event&quot;&gt;
