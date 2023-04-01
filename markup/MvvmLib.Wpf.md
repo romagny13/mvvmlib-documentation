@@ -264,7 +264,7 @@ public class ProtectedViewModel : BindableBase, ISupportNavigation, ISupportActi
 
 ### Registering views (and view models) for navigation
 
-`ConfigurableNavigationService` is easy to configure (do not require to use a bootstrapper)
+`ConfigurableNavigationService` is easy to configure (does not require to use a bootstrapper)
 
 ```cs
 var navigationService = new ConfigurableNavigationService
