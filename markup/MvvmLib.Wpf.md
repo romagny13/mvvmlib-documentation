@@ -22,20 +22,53 @@ Default **convention**:
 
 ### Change the convention
 
-Example with "View" and "ViewModel" namespaces
+Example 1: with "View" and "ViewModel" namespaces
 
 ```cs
 ViewModelLocationProvider.ChangeConvention((viewType) =>
 {
-  var viewFullName = viewType.FullName;
-  viewFullName = viewFullName.Replace(".View.", ".ViewModel."); // <=
-  var suffix = viewFullName.EndsWith("View") ? "Model" : "ViewModel";
-  var viewModelFullName = string.Format(CultureInfo.InvariantCulture, "{0}{1}", viewFullName, suffix);
-  var viewModelType = viewType.Assembly.GetType(viewModelFullName);
+    // "View" and "ViewModel" folders
+    var prefix  = viewType.FullName.Replace(".View.", ".ViewModel.");
+    var suffix = viewType.Name.EndsWith("View") ? "Model" : "ViewModel"; 
+    var assemblyFullName = viewType.Assembly.FullName; 
 
-  return viewModelType;
+    var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "{0}{1}, {2}", prefix, suffix, assemblyFullName);
+    return Type.GetType(viewModelTypeName);
 });
 ```
+
+Example 2: with `multiple view folders`
+
+```cs
+ViewModelLocationProvider.ChangeConvention(viewType =>
+{
+    // "Menus" or "Views"
+    string prefix = viewType.FullName.Contains(".Menus.") ?
+    viewType.FullName.Replace(".Menus.", ".ViewModels.")
+    : viewType.FullName.Replace(".Views.", ".ViewModels.");
+
+    var suffix = viewType.Name.EndsWith("View") ? "Model" : "ViewModel"; 
+    var assemblyFullName = viewType.Assembly.FullName; 
+
+    var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "{0}{1}, {2}", prefix, suffix, assemblyFullName);
+    return Type.GetType(viewModelTypeName);
+});
+```
+
+Example 3: ViewModels in `other assembly`
+
+```cs
+ViewModelLocationProvider.ChangeConvention(viewType =>
+{
+    // Class Library "Lib"
+    var viewModelName = viewType.Name.EndsWith("View") ? $"{viewType.Name}Model" : $"{viewType.Name}ViewModel";
+    var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "Lib.ViewModels.{0}, Lib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", viewModelName);
+    var viewModelType = Type.GetType(viewModelTypeName);
+
+    return viewModelType;
+});
+```
+
 
 ### Register a custom View Model for a view
 
@@ -766,6 +799,54 @@ public partial class MainWindow : Window
     }
 }
 ```
+
+## Multiple Navigation Services
+
+Suggestion: Create a class with all Navigation services used
+
+```cs
+public interface IApplicationNavigationServices
+{
+    INavigationService Child { get; }
+    INavigationService Main { get; }
+}
+
+public class ApplicationNavigationServices : IApplicationNavigationServices
+{
+    private INavigationService _main;
+    public INavigationService Main
+    {
+        get
+        {
+            if (_main == null)
+                _main = new NavigationService();
+            return _main;
+        }
+    }
+
+    private INavigationService _child;
+    public INavigationService Child
+    {
+        get
+        {
+            if (_child == null)
+                _child = new NavigationService();
+            return _child;
+        }
+    }
+
+    // etc.
+}
+```
+
+... register with the container
+
+```cs
+Container.RegisterSingleton<IApplicationNavigationServices,ApplicationNavigationServices>();
+```
+
+... inject the ApplicationNavigationServices in ViewModels
+
 
 ## Data
 

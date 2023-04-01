@@ -18,5 +18,5 @@ PM> Install-Package MvvmLib.IoC.Extensions
 ```
 
 <p align="center">
-<img src="https://res.cloudinary.com/romagny13/image/upload/v1553188957/mvvm_logo_xxv5gn.png">
+<img src="https://res.cloudinary.com/du6bjt9gj/image/upload/v1680387405/mvvmlib_logo_czjc6o.png">
 </p>

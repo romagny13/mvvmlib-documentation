@@ -47,6 +47,8 @@
 
 <li class="tocentry"><a href="#create-a-custom-navigation-service">Create a custom Navigation Service</a></li>
 
+<li class="tocentry"><a href="#multiple-navigation-services">Multiple Navigation Services</a></li>
+
 <li class="tocentry"><a href="#data">Data</a></li>
 
 <li class="tocentry"><a href="#controls">Controls</a></li>
@@ -116,16 +118,44 @@ View model name:
 </li>
 </ul>
 <h3 id="change-the-convention">Change the convention<a class="headerlink" href="#change-the-convention" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>Example with &quot;View&quot; and &quot;ViewModel&quot; namespaces</p>
+<p>Example 1: with &quot;View&quot; and &quot;ViewModel&quot; namespaces</p>
 <pre><code class="cs">ViewModelLocationProvider.ChangeConvention((viewType) =&gt;
 {
-  var viewFullName = viewType.FullName;
-  viewFullName = viewFullName.Replace(&quot;.View.&quot;, &quot;.ViewModel.&quot;); // &lt;=
-  var suffix = viewFullName.EndsWith(&quot;View&quot;) ? &quot;Model&quot; : &quot;ViewModel&quot;;
-  var viewModelFullName = string.Format(CultureInfo.InvariantCulture, &quot;{0}{1}&quot;, viewFullName, suffix);
-  var viewModelType = viewType.Assembly.GetType(viewModelFullName);
+    // &quot;View&quot; and &quot;ViewModel&quot; folders
+    var prefix  = viewType.FullName.Replace(&quot;.View.&quot;, &quot;.ViewModel.&quot;);
+    var suffix = viewType.Name.EndsWith(&quot;View&quot;) ? &quot;Model&quot; : &quot;ViewModel&quot;; 
+    var assemblyFullName = viewType.Assembly.FullName; 
 
-  return viewModelType;
+    var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, &quot;{0}{1}, {2}&quot;, prefix, suffix, assemblyFullName);
+    return Type.GetType(viewModelTypeName);
+});
+</code></pre>
+
+<p>Example 2: with <code>multiple view folders</code></p>
+<pre><code class="cs">ViewModelLocationProvider.ChangeConvention(viewType =&gt;
+{
+    // &quot;Menus&quot; or &quot;Views&quot;
+    string prefix = viewType.FullName.Contains(&quot;.Menus.&quot;) ?
+    viewType.FullName.Replace(&quot;.Menus.&quot;, &quot;.ViewModels.&quot;)
+    : viewType.FullName.Replace(&quot;.Views.&quot;, &quot;.ViewModels.&quot;);
+
+    var suffix = viewType.Name.EndsWith(&quot;View&quot;) ? &quot;Model&quot; : &quot;ViewModel&quot;; 
+    var assemblyFullName = viewType.Assembly.FullName; 
+
+    var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, &quot;{0}{1}, {2}&quot;, prefix, suffix, assemblyFullName);
+    return Type.GetType(viewModelTypeName);
+});
+</code></pre>
+
+<p>Example 3: ViewModels in <code>other assembly</code></p>
+<pre><code class="cs">ViewModelLocationProvider.ChangeConvention(viewType =&gt;
+{
+    // Class Library &quot;Lib&quot;
+    var viewModelName = viewType.Name.EndsWith(&quot;View&quot;) ? $&quot;{viewType.Name}Model&quot; : $&quot;{viewType.Name}ViewModel&quot;;
+    var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, &quot;Lib.ViewModels.{0}, Lib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot;, viewModelName);
+    var viewModelType = Type.GetType(viewModelTypeName);
+
+    return viewModelType;
 });
 </code></pre>
 
@@ -864,6 +894,47 @@ public class CustomJournal : NavigationJournal
 }
 </code></pre>
 
+<h2 id="multiple-navigation-services">Multiple Navigation Services<a class="headerlink" href="#multiple-navigation-services" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Suggestion: Create a class with all Navigation services used</p>
+<pre><code class="cs">public interface IApplicationNavigationServices
+{
+    INavigationService Child { get; }
+    INavigationService Main { get; }
+}
+
+public class ApplicationNavigationServices : IApplicationNavigationServices
+{
+    private INavigationService _main;
+    public INavigationService Main
+    {
+        get
+        {
+            if (_main == null)
+                _main = new NavigationService();
+            return _main;
+        }
+    }
+
+    private INavigationService _child;
+    public INavigationService Child
+    {
+        get
+        {
+            if (_child == null)
+                _child = new NavigationService();
+            return _child;
+        }
+    }
+
+    // etc.
+}
+</code></pre>
+
+<p>... register with the container</p>
+<pre><code class="cs">Container.RegisterSingleton&lt;IApplicationNavigationServices,ApplicationNavigationServices&gt;();
+</code></pre>
+
+<p>... inject the ApplicationNavigationServices in ViewModels</p>
 <h2 id="data">Data<a class="headerlink" href="#data" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <h3 id="listcollectionviewex">ListCollectionViewEx<a class="headerlink" href="#listcollectionviewex" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>Is a ListCollectionView with shortcuts and usefull methods</p>
