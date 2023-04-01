@@ -55,7 +55,7 @@ ViewModelLocationProvider.ChangeConvention(viewType =>
 });
 ```
 
-Example 3: ViewModels in `other assembly`
+Example 3: ViewModels in `another assembly`
 
 ```cs
 ViewModelLocationProvider.ChangeConvention(viewType =>
