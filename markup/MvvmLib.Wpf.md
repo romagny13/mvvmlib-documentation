@@ -76,7 +76,7 @@ ViewModelLocationProvider.ChangeConvention(viewType =>
 ViewModelLocationProvider.Register<Shell, CustomViewModel>();
 ```
 
-Or with factory
+Or with a `factory`
 
 ```cs
 ViewModelLocationProvider.Register<Shell>(() => new CustomViewModel());
