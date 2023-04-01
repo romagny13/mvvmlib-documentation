@@ -67,14 +67,16 @@
                     <div class="section">
 <h1 id="mvvmlib.scanning">MvvmLib.Scanning<a class="headerlink" href="#mvvmlib.scanning" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
 <blockquote>
-<p>Allows to scan assemblies to filter types and resolve implementation types.</p>
+<p>Allows to scan assemblies, filter types and resolve implementation types.</p>
 </blockquote>
 <p>Example</p>
-<pre><code class="cs">var services = Scrutor.Default.Scan(scan =&gt; scan.FromCallingAssembly().InExactNamespaceOf&lt;IService&gt;()).AsImplementedInterfaces();
+<pre><code class="cs">var services = Scrutor.Default.Scan(scan =&gt; scan.FromCallingAssembly()
+    .InExactNamespaceOf&lt;IService&gt;()).AsImplementedInterfaces();
+
 var views = Scrutor.Default.AsSelfInExactNamespaceOf&lt;Shell&gt;();
 </code></pre>
 
-<p>Strategies availables for multiple implementation found (<code>ScanOptions</code>) : </p>
+<p>Strategies availables for multiple implementations found (<code>ScanOptions</code>) : </p>
 <ul>
 <li>All (default)</li>
 <li>First </li>

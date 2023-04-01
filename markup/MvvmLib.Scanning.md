@@ -1,15 +1,17 @@
 # MvvmLib.Scanning
 
-> Allows to scan assemblies to filter types and resolve implementation types.
+> Allows to scan assemblies, filter types and resolve implementation types.
 
 Example
 
 ```cs
-var services = Scrutor.Default.Scan(scan => scan.FromCallingAssembly().InExactNamespaceOf<IService>()).AsImplementedInterfaces();
+var services = Scrutor.Default.Scan(scan => scan.FromCallingAssembly()
+    .InExactNamespaceOf<IService>()).AsImplementedInterfaces();
+
 var views = Scrutor.Default.AsSelfInExactNamespaceOf<Shell>();
 ```
 
-Strategies availables for multiple implementation found (`ScanOptions`) : 
+Strategies availables for multiple implementations found (`ScanOptions`) : 
 
 * All (default)
 * First 
