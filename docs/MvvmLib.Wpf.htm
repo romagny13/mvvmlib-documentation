@@ -49,6 +49,8 @@
 
 <li class="tocentry"><a href="#multiple-navigation-services">Multiple Navigation Services</a></li>
 
+<li class="tocentry"><a href="#showing-multiple-shells">Showing multiple shells</a></li>
+
 <li class="tocentry"><a href="#data">Data</a></li>
 
 <li class="tocentry"><a href="#controls">Controls</a></li>
@@ -812,10 +814,6 @@ public static class NavigationContextExtensions
 
 public class SyncStackPanelBehavior : NavigationBehavior&lt;StackPanel&gt;
 {
-    public SyncStackPanelBehavior(StackPanel associatedObject) : base(associatedObject)
-    {
-    }
-
     protected CustomNavigationService CustomNavigationService =&gt; NavigationService as CustomNavigationService;
 
     protected override void OnAttach()
@@ -889,7 +887,7 @@ public class CustomJournal : NavigationJournal
     {
         InitializeComponent();
 
-        navigationService.Attach(new SyncStackPanelBehavior(Panel));
+        navigationService.Attach(new SyncStackPanelBehavior { AssociatedObject = Panel });
     }
 }
 </code></pre>
@@ -935,6 +933,74 @@ public class ApplicationNavigationServices : IApplicationNavigationServices
 </code></pre>
 
 <p>... inject the ApplicationNavigationServices in ViewModels</p>
+<h2 id="showing-multiple-shells">Showing multiple shells<a class="headerlink" href="#showing-multiple-shells" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Create a ShellService and an interface ISupportNavigationService to set the NavigationService used by the ShellViewModel</p>
+<pre><code class="cs">public interface ISupportNavigationService
+{
+    INavigationService NavigationService { get; set; }
+}
+
+public interface IShellService
+{
+    void ShowShell();
+}
+
+public class ShellService : IShellService
+{
+    public virtual void ShowShell()
+    {
+        var shell = CreateShell();
+
+        TryAutoWireViewModel(shell);
+        TrySetNavigationService(shell);
+
+        ShowShell(shell);
+    }
+
+    protected virtual Window CreateShell() =&gt; ContainerLocator.Current.Resolve&lt;Shell&gt;();
+
+    protected virtual void TryAutoWireViewModel(FrameworkElement element) =&gt; MvvmUtils.TryAutoWireViewModel(element);
+
+    protected virtual void TrySetNavigationService(object content)
+        =&gt; MvvmUtils.ViewAndViewModelAction&lt;ISupportNavigationService&gt;(content, isns =&gt; isns.NavigationService = CreateScopedNavigationService());
+
+    // for multiple navigation services: provide a new instance of a class with all navigation services
+    protected virtual INavigationService CreateScopedNavigationService() =&gt; new NavigationService();
+
+    protected virtual void ShowShell(Window shell) =&gt; shell.Show();
+}
+</code></pre>
+
+<p>ShellViewModel sample</p>
+<pre><code class="cs">public class ShellViewModel : ISupportNavigationService, ISupportLoaded
+{
+    public ShellViewModel(IShellService shellService)
+    {
+        _shellService = shellService;
+        Commands = new NavigationServiceCommands();
+    }
+
+    public INavigationService NavigationService { get; set; }
+    public NavigationServiceCommands Commands { get; }
+
+    private DelegateCommand _showShellCommand;
+    private readonly IShellService _shellService;
+
+    public DelegateCommand ShowShellCommand =&gt;
+        _showShellCommand ?? (_showShellCommand = new DelegateCommand(ExecuteShowShellCommand));
+
+    private void ExecuteShowShellCommand()
+    {
+        _shellService.ShowShell();
+    }
+
+    public void OnLoaded()
+    {
+        Commands.Initialize(NavigationService);
+    }
+}
+</code></pre>
+
 <h2 id="data">Data<a class="headerlink" href="#data" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <h3 id="listcollectionviewex">ListCollectionViewEx<a class="headerlink" href="#listcollectionviewex" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>Is a ListCollectionView with shortcuts and usefull methods</p>

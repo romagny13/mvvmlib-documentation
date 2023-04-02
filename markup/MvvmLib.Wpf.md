@@ -714,10 +714,6 @@ public class CustomNavigationService : NavigationService, ICustomNavigationServi
 
 public class SyncStackPanelBehavior : NavigationBehavior<StackPanel>
 {
-    public SyncStackPanelBehavior(StackPanel associatedObject) : base(associatedObject)
-    {
-    }
-
     protected CustomNavigationService CustomNavigationService => NavigationService as CustomNavigationService;
 
     protected override void OnAttach()
@@ -795,7 +791,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        navigationService.Attach(new SyncStackPanelBehavior(Panel));
+        navigationService.Attach(new SyncStackPanelBehavior { AssociatedObject = Panel });
     }
 }
 ```
@@ -847,6 +843,79 @@ Container.RegisterSingleton<IApplicationNavigationServices,ApplicationNavigation
 
 ... inject the ApplicationNavigationServices in ViewModels
 
+
+## Showing multiple shells
+
+Create a ShellService and an interface ISupportNavigationService to set the NavigationService used by the ShellViewModel
+
+```cs
+public interface ISupportNavigationService
+{
+    INavigationService NavigationService { get; set; }
+}
+
+public interface IShellService
+{
+    void ShowShell();
+}
+
+public class ShellService : IShellService
+{
+    public virtual void ShowShell()
+    {
+        var shell = CreateShell();
+
+        TryAutoWireViewModel(shell);
+        TrySetNavigationService(shell);
+
+        ShowShell(shell);
+    }
+
+    protected virtual Window CreateShell() => ContainerLocator.Current.Resolve<Shell>();
+
+    protected virtual void TryAutoWireViewModel(FrameworkElement element) => MvvmUtils.TryAutoWireViewModel(element);
+
+    protected virtual void TrySetNavigationService(object content)
+        => MvvmUtils.ViewAndViewModelAction<ISupportNavigationService>(content, isns => isns.NavigationService = CreateScopedNavigationService());
+
+    // for multiple navigation services: provide a new instance of a class with all navigation services
+    protected virtual INavigationService CreateScopedNavigationService() => new NavigationService();
+
+    protected virtual void ShowShell(Window shell) => shell.Show();
+}
+```
+
+ShellViewModel sample
+
+```cs
+public class ShellViewModel : ISupportNavigationService, ISupportLoaded
+{
+    public ShellViewModel(IShellService shellService)
+    {
+        _shellService = shellService;
+        Commands = new NavigationServiceCommands();
+    }
+
+    public INavigationService NavigationService { get; set; }
+    public NavigationServiceCommands Commands { get; }
+
+    private DelegateCommand _showShellCommand;
+    private readonly IShellService _shellService;
+
+    public DelegateCommand ShowShellCommand =>
+        _showShellCommand ?? (_showShellCommand = new DelegateCommand(ExecuteShowShellCommand));
+
+    private void ExecuteShowShellCommand()
+    {
+        _shellService.ShowShell();
+    }
+
+    public void OnLoaded()
+    {
+        Commands.Initialize(NavigationService);
+    }
+}
+```
 
 ## Data
 
