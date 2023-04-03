@@ -296,23 +296,23 @@ View model name:
     public ShellViewModel(INavigationService navigationService)
     {
         NavigationService = navigationService;
-        NavigationCommands = new NavigationServiceCommands(NavigationService);
+        Commands = new NavigationServiceCommands(NavigationService);
         NavigationService.Navigate(&quot;HomeView&quot;);
     }
 
     public INavigationService NavigationService { get; }
-    public NavigationServiceCommands NavigationCommands { get; }
+    public NavigationServiceCommands Commands { get; }
 }
 </code></pre>
 
 <p>Bind commands in view</p>
-<pre><code class="xml">&lt;Button Command=&quot;{Binding NavigationCommands.MoveToFirstCommand}&quot; Width=&quot;50&quot;&gt;&amp;lt;&amp;lt;&lt;/Button&gt;
-&lt;Button Command=&quot;{Binding NavigationCommands.MoveToPreviousCommand}&quot; Width=&quot;50&quot;&gt;&amp;lt;/Button&gt;
-&lt;Button Command=&quot;{Binding NavigationCommands.MoveToNextCommand}&quot; Width=&quot;50&quot;&gt;&amp;gt;&lt;/Button&gt;
-&lt;Button Command=&quot;{Binding NavigationCommands.MoveToLastCommand}&quot; Width=&quot;50&quot;&gt;&amp;gt;&amp;gt;&lt;/Button&gt;
-&lt;Button Command=&quot;{Binding NavigationCommands.NavigateCommand}&quot; CommandParameter=&quot;HomeView&quot;&gt;Home&lt;/Button&gt;
+<pre><code class="xml">&lt;Button Command=&quot;{Binding Commands.MoveToFirstCommand}&quot; Width=&quot;50&quot;&gt;&amp;lt;&amp;lt;&lt;/Button&gt;
+&lt;Button Command=&quot;{Binding Commands.MoveToPreviousCommand}&quot; Width=&quot;50&quot;&gt;&amp;lt;/Button&gt;
+&lt;Button Command=&quot;{Binding Commands.MoveToNextCommand}&quot; Width=&quot;50&quot;&gt;&amp;gt;&lt;/Button&gt;
+&lt;Button Command=&quot;{Binding Commands.MoveToLastCommand}&quot; Width=&quot;50&quot;&gt;&amp;gt;&amp;gt;&lt;/Button&gt;
+&lt;Button Command=&quot;{Binding Commands.NavigateCommand}&quot; CommandParameter=&quot;HomeView&quot;&gt;Home&lt;/Button&gt;
 &lt;!-- with parameter --&gt;
-&lt;Button Command=&quot;{Binding NavigationCommands.NavigateCommand}&quot; CommandParameter=&quot;ViewA?id=sample-id&quot;&gt;View A&lt;/Button&gt;&gt;
+&lt;Button Command=&quot;{Binding Commands.NavigateCommand}&quot; CommandParameter=&quot;ViewA?id=sample-id&quot;&gt;View A&lt;/Button&gt;&gt;
 </code></pre>
 
 <p>In code</p>

@@ -145,25 +145,25 @@ public class ShellViewModel
     public ShellViewModel(INavigationService navigationService)
     {
         NavigationService = navigationService;
-        NavigationCommands = new NavigationServiceCommands(NavigationService);
+        Commands = new NavigationServiceCommands(NavigationService);
         NavigationService.Navigate("HomeView");
     }
 
     public INavigationService NavigationService { get; }
-    public NavigationServiceCommands NavigationCommands { get; }
+    public NavigationServiceCommands Commands { get; }
 }
 ```
 
 Bind commands in view
 
 ```xml
-<Button Command="{Binding NavigationCommands.MoveToFirstCommand}" Width="50">&lt;&lt;</Button>
-<Button Command="{Binding NavigationCommands.MoveToPreviousCommand}" Width="50">&lt;/Button>
-<Button Command="{Binding NavigationCommands.MoveToNextCommand}" Width="50">&gt;</Button>
-<Button Command="{Binding NavigationCommands.MoveToLastCommand}" Width="50">&gt;&gt;</Button>
-<Button Command="{Binding NavigationCommands.NavigateCommand}" CommandParameter="HomeView">Home</Button>
+<Button Command="{Binding Commands.MoveToFirstCommand}" Width="50">&lt;&lt;</Button>
+<Button Command="{Binding Commands.MoveToPreviousCommand}" Width="50">&lt;/Button>
+<Button Command="{Binding Commands.MoveToNextCommand}" Width="50">&gt;</Button>
+<Button Command="{Binding Commands.MoveToLastCommand}" Width="50">&gt;&gt;</Button>
+<Button Command="{Binding Commands.NavigateCommand}" CommandParameter="HomeView">Home</Button>
 <!-- with parameter -->
-<Button Command="{Binding NavigationCommands.NavigateCommand}" CommandParameter="ViewA?id=sample-id">View A</Button>>
+<Button Command="{Binding Commands.NavigateCommand}" CommandParameter="ViewA?id=sample-id">View A</Button>>
 ```
 
 In code
