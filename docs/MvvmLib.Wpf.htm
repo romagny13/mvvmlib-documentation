@@ -324,8 +324,21 @@ NavigationService.Navigate(&quot;ViewA?tag=sample&quot;, new NavigateParameters
 {
     { &quot;id&quot;, 10 }
 });
-// ViewModel
-NavigationService.Navigate(&quot;ViewAViewModel&quot;);
+</code></pre>
+
+<p>It's possible to <code>navigate to ViewModels</code></p>
+<pre><code class="cs">NavigationService.Navigate(&quot;ViewAViewModel&quot;);
+</code></pre>
+
+<p><em>Define a DataTemplate</em></p>
+<pre><code class="xml">&lt;DataTemplate DataType=&quot;{x:Type viewModels:ViewAViewModel}&quot;&gt;
+    &lt;views:ViewA /&gt;
+&lt;/DataTemplate&gt;
+</code></pre>
+
+<p><em>And register for navigation</em></p>
+<pre><code class="cs">// Example with IUnityContainer (Unity Bootstrapper)
+Container.RegisterForNavigation&lt;ViewAViewModel&gt;();
 </code></pre>
 
 <p>Replace: example remove LoginView from navigation journal</p>
@@ -409,10 +422,13 @@ NavigationService.Navigate(&quot;ViewAViewModel&quot;);
 <p><code>ConfigurableNavigationService</code> is easy to configure (does not require to use a bootstrapper)</p>
 <pre><code class="cs">var navigationService = new ConfigurableNavigationService
 {
+    // Name (&quot;PageKey&quot;, used in Uri or UriString) =&gt; Type
     PageAssociations = new Dictionary&lt;string, Type&gt;
     {
         { &quot;HomeView&quot;, typeof(HomeView) },
         { &quot;ViewA&quot;, typeof(ViewA) },
+        // With ViewModel for example
+        { &quot;ViewBViewModel&quot;, typeof(ViewBViewModel) },
         // etc.
     }
 };

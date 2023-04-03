@@ -177,8 +177,26 @@ NavigationService.Navigate("ViewA?tag=sample", new NavigateParameters
 {
     { "id", 10 }
 });
-// ViewModel
+```
+
+It's possible to `navigate to ViewModels`
+
+```cs
 NavigationService.Navigate("ViewAViewModel");
+```
+_Define a DataTemplate_
+
+```xml
+<DataTemplate DataType="{x:Type viewModels:ViewAViewModel}">
+    <views:ViewA />
+</DataTemplate>
+```
+
+_And register for navigation_
+
+```cs
+// Example with IUnityContainer (Unity Bootstrapper)
+Container.RegisterForNavigation<ViewAViewModel>();
 ```
 
 Replace: example remove LoginView from navigation journal
@@ -269,10 +287,13 @@ public class ProtectedViewModel : BindableBase, ISupportNavigation, ISupportActi
 ```cs
 var navigationService = new ConfigurableNavigationService
 {
+    // Name ("PageKey", used in Uri or UriString) => Type
     PageAssociations = new Dictionary<string, Type>
     {
         { "HomeView", typeof(HomeView) },
         { "ViewA", typeof(ViewA) },
+        // With ViewModel for example
+        { "ViewBViewModel", typeof(ViewBViewModel) },
         // etc.
     }
 };
