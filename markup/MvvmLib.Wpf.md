@@ -93,6 +93,8 @@ Example:
          ml:ViewModelLocator.AutoWireViewModel="True">
 ```
 
+Note: the __attached property can be omitted with a NavigationService__ (automatically tries to resolve the ViewModel for a View)
+
 ## Navigation
 
 ### NavigationService
