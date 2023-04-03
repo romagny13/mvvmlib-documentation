@@ -1389,45 +1389,24 @@ var pagedList = Users.ToPagedList&lt;User&gt;(pageNumber, pageSize);
 </code></pre>
 
 <h2 id="interactivity">Interactivity<a class="headerlink" href="#interactivity" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
-<h3 id="triggers-and-triggeractions">Triggers and TriggerActions<a class="headerlink" href="#triggers-and-triggeractions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>EventTrigger</p>
-<pre><code class="xml">&lt;Button x:Name=&quot;Button1&quot; Content=&quot;Click!&quot;&gt;
-    &lt;ml:Interaction.Triggers&gt;
-        &lt;ml:EventTrigger EventName=&quot;Click&quot;&gt;
-            &lt;ml:CallMethodAction TargetObject=&quot;{Binding}&quot; MethodName=&quot;SayHello&quot; Parameter=&quot;My parameter&quot; /&gt;
-            &lt;ml:InvokeCommandAction Command=&quot;{Binding MyCommand}&quot; CommandParameter=&quot;My parameter&quot;/&gt;
-            &lt;ml:ChangePropertyAction TargetObject=&quot;{Binding ElementName=Button1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Red&quot;/&gt;
-        &lt;/ml:EventTrigger&gt;
-    &lt;/ml:Interaction.Triggers&gt;
+<blockquote>
+<p>Uses <a href="https://github.com/Microsoft/XamlBehaviorsWpf" target="_blank">Microsoft.Xaml.Behaviors.Wpf</a></p>
+</blockquote>
+<p>Namespaces:</p>
+<pre><code class="xml">xmlns:i=&quot;http://schemas.microsoft.com/xaml/behaviors&quot;
+xmlns:ml=&quot;http://mvvmlib.com/&quot;
+</code></pre>
+
+<h3 id="callmethodaction-with-parameter">CallMethodAction with parameter<a class="headerlink" href="#callmethodaction-with-parameter" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<pre><code class="xml">&lt;Button Content=&quot;CallMethodAction Sample&quot;&gt;
+    &lt;i:Interaction.Triggers&gt;
+        &lt;i:EventTrigger EventName=&quot;Click&quot;&gt;
+            &lt;ml:CallMethodAction TargetObject=&quot;{Binding}&quot; MethodName=&quot;MyMethod&quot; Parameter=&quot;MvvmLib!&quot;/&gt;
+        &lt;/i:EventTrigger&gt;
+    &lt;/i:Interaction.Triggers&gt;
 &lt;/Button&gt;
 </code></pre>
 
-<p>DataTrigger</p>
-<pre><code class="xml">&lt;TextBlock x:Name=&quot;TextBlock1&quot; Text=&quot;{Binding MyValue}&quot;&gt;
-    &lt;ml:Interaction.Triggers&gt;
-        &lt;ml:DataTrigger Binding=&quot;{Binding MyValue}&quot; Value=&quot;My value&quot;&gt;
-            &lt;ml:ChangePropertyAction TargetObject=&quot;{Binding ElementName=TextBlock1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Red&quot;/&gt;
-        &lt;/ml:DataTrigger&gt;
-        &lt;ml:DataTrigger Binding=&quot;{Binding MyValue}&quot; Comparison=&quot;NotEqual&quot; Value=&quot;My value&quot;&gt;
-            &lt;ml:ChangePropertyAction TargetObject=&quot;{Binding ElementName=TextBlock1}&quot; PropertyPath=&quot;Foreground&quot; Value=&quot;Blue&quot;/&gt;
-        &lt;/ml:DataTrigger&gt;
-    &lt;/ml:Interaction.Triggers&gt;
-&lt;/TextBlock&gt;
-</code></pre>
-
-<p>Triggers:</p>
-<ul>
-<li>EventTrigger</li>
-<li>DataTrigger</li>
-</ul>
-<p>TriggerActions:</p>
-<ul>
-<li>CallMethodAction</li>
-<li>InvokeCommandAction</li>
-<li>ChangePropertyAction</li>
-<li>GoToStateAction</li>
-</ul>
-<p>It's possible to create custom Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).</p>
 <h3 id="create-a-custom-triggeraction">Create a custom TriggerAction<a class="headerlink" href="#create-a-custom-triggeraction" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>Example: for closing TabItem</p>
 <pre><code class="cs">public class CloseTabAction : TriggerAction&lt;Button&gt;
@@ -1503,26 +1482,25 @@ public class XamlTreeHelper
 
 <h3 id="behaviors">Behaviors<a class="headerlink" href="#behaviors" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>EventToCommandBehavior</p>
-<pre><code class="xml">&lt;Button Content=&quot;Click event&quot;&gt;
-    &lt;ml:NavigationInteraction.Behaviors&gt;
+<pre><code class="xml">&lt;Button Content=&quot;EventToCommandBehavior Sample&quot;&gt;
+    &lt;i:Interaction.Behaviors&gt;
         &lt;ml:EventToCommandBehavior EventName=&quot;Click&quot; Command=&quot;{Binding MessageCommand}&quot; CommandParameter=&quot;World&quot;/&gt;
-    &lt;/ml:NavigationInteraction.Behaviors&gt;
+    &lt;/i:Interaction.Behaviors&gt;
 &lt;/Button&gt;
 </code></pre>
 
 <p>SelectorSelectedItemsSyncBehavior</p>
-<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding Users}&quot;
+<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding Users}&quot; 
             SelectionMode=&quot;Multiple&quot;
-            SelectedItem=&quot;{Binding SelectedUser}&quot;
-            MinHeight=&quot;100&quot;&gt;
-    &lt;ml:Interaction.Behaviors&gt;
+            SelectedItem=&quot;{Binding SelectedUser}&quot;&gt;
+    &lt;i:Interaction.Behaviors&gt;
         &lt;ml:SelectorSelectedItemsSyncBehavior ActiveItems=&quot;{Binding SelectedUsers}&quot;/&gt;
-    &lt;/ml:Interaction.Behaviors&gt;
+    &lt;/i:Interaction.Behaviors&gt;
 &lt;/ListBox&gt;
 </code></pre>
 
 <p>TreeViewSelectedItemChangedBehavior</p>
-<pre><code class="xml">&lt;TreeView ItemsSource=&quot;{Binding Families}&quot; MinHeight=&quot;100&quot;&gt;
+<pre><code class="xml"> &lt;TreeView ItemsSource=&quot;{Binding Families}&quot;&gt;
     &lt;TreeView.Resources&gt;
         &lt;HierarchicalDataTemplate DataType=&quot;{x:Type viewModels:Family}&quot; ItemsSource=&quot;{Binding Members}&quot;&gt;
             &lt;StackPanel Orientation=&quot;Horizontal&quot;&gt;
@@ -1535,11 +1513,11 @@ public class XamlTreeHelper
             &lt;/StackPanel&gt;
         &lt;/DataTemplate&gt;
     &lt;/TreeView.Resources&gt;
-    &lt;ml:Interaction.Behaviors&gt;
-        &lt;ml:TreeViewSelectedItemChangedBehavior
-            ExpandSelected=&quot;True&quot;
+    &lt;i:Interaction.Behaviors&gt;
+        &lt;ml:TreeViewSelectedItemChangedBehavior 
+            ExpandSelected=&quot;True&quot; 
             SelectedItem=&quot;{Binding ActiveFamilyOrMember}&quot; /&gt;
-    &lt;/ml:Interaction.Behaviors&gt;
+    &lt;/i:Interaction.Behaviors&gt;
 &lt;/TreeView&gt;
 </code></pre>
 

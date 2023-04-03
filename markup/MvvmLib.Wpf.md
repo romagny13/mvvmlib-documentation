@@ -1336,50 +1336,27 @@ Example 2 xaml
 
 ## Interactivity
 
-### Triggers and TriggerActions
+> Uses [Microsoft.Xaml.Behaviors.Wpf](https://github.com/Microsoft/XamlBehaviorsWpf)
 
-EventTrigger
+Namespaces:
 
 ```xml
-<Button x:Name="Button1" Content="Click!">
-    <ml:Interaction.Triggers>
-        <ml:EventTrigger EventName="Click">
-            <ml:CallMethodAction TargetObject="{Binding}" MethodName="SayHello" Parameter="My parameter" />
-            <ml:InvokeCommandAction Command="{Binding MyCommand}" CommandParameter="My parameter"/>
-            <ml:ChangePropertyAction TargetObject="{Binding ElementName=Button1}" PropertyPath="Foreground" Value="Red"/>
-        </ml:EventTrigger>
-    </ml:Interaction.Triggers>
+xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+xmlns:ml="http://mvvmlib.com/"
+```
+
+
+### CallMethodAction with parameter
+
+```xml
+<Button Content="CallMethodAction Sample">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Click">
+            <ml:CallMethodAction TargetObject="{Binding}" MethodName="MyMethod" Parameter="MvvmLib!"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 </Button>
 ```
-
-DataTrigger
-
-```xml
-<TextBlock x:Name="TextBlock1" Text="{Binding MyValue}">
-    <ml:Interaction.Triggers>
-        <ml:DataTrigger Binding="{Binding MyValue}" Value="My value">
-            <ml:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock1}" PropertyPath="Foreground" Value="Red"/>
-        </ml:DataTrigger>
-        <ml:DataTrigger Binding="{Binding MyValue}" Comparison="NotEqual" Value="My value">
-            <ml:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock1}" PropertyPath="Foreground" Value="Blue"/>
-        </ml:DataTrigger>
-    </ml:Interaction.Triggers>
-</TextBlock>
-```
-
-Triggers:
-
-- EventTrigger
-- DataTrigger
-
-TriggerActions:
-
-- CallMethodAction
-- InvokeCommandAction
-- ChangePropertyAction
-- GoToStateAction
-
-It's possible to create custom Triggers (inherit from TriggerBase) and TriggerActions (inherit from TriggerAction and implement Invoke method).
 
 ### Create a custom TriggerAction
 
@@ -1466,30 +1443,29 @@ And the TabControl: ItemsSource binded to the Views of a Custom NavigationServic
 EventToCommandBehavior
 
 ```xml
-<Button Content="Click event">
-    <ml:NavigationInteraction.Behaviors>
+<Button Content="EventToCommandBehavior Sample">
+    <i:Interaction.Behaviors>
         <ml:EventToCommandBehavior EventName="Click" Command="{Binding MessageCommand}" CommandParameter="World"/>
-    </ml:NavigationInteraction.Behaviors>
+    </i:Interaction.Behaviors>
 </Button>
 ```
 
 SelectorSelectedItemsSyncBehavior
 
 ```xml
-<ListBox ItemsSource="{Binding Users}"
+<ListBox ItemsSource="{Binding Users}" 
             SelectionMode="Multiple"
-            SelectedItem="{Binding SelectedUser}"
-            MinHeight="100">
-    <ml:Interaction.Behaviors>
+            SelectedItem="{Binding SelectedUser}">
+    <i:Interaction.Behaviors>
         <ml:SelectorSelectedItemsSyncBehavior ActiveItems="{Binding SelectedUsers}"/>
-    </ml:Interaction.Behaviors>
+    </i:Interaction.Behaviors>
 </ListBox>
 ```
 
 TreeViewSelectedItemChangedBehavior
 
 ```xml
-<TreeView ItemsSource="{Binding Families}" MinHeight="100">
+ <TreeView ItemsSource="{Binding Families}">
     <TreeView.Resources>
         <HierarchicalDataTemplate DataType="{x:Type viewModels:Family}" ItemsSource="{Binding Members}">
             <StackPanel Orientation="Horizontal">
@@ -1502,11 +1478,11 @@ TreeViewSelectedItemChangedBehavior
             </StackPanel>
         </DataTemplate>
     </TreeView.Resources>
-    <ml:Interaction.Behaviors>
-        <ml:TreeViewSelectedItemChangedBehavior
-            ExpandSelected="True"
+    <i:Interaction.Behaviors>
+        <ml:TreeViewSelectedItemChangedBehavior 
+            ExpandSelected="True" 
             SelectedItem="{Binding ActiveFamilyOrMember}" />
-    </ml:Interaction.Behaviors>
+    </i:Interaction.Behaviors>
 </TreeView>
 ```
 
