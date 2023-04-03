@@ -99,7 +99,8 @@ Note: the __attached property can be omitted with a NavigationService__ (automat
 
 ### NavigationService
 
-Easy to use / customize, Mvvm support, injectable, etc.
+> Simple, customizable, bindable, injectable, etc.
+
 
 | Method         | Description                                                         |
 | -------------- | ------------------------------------------------------------------- |
