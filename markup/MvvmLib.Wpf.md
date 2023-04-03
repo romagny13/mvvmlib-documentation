@@ -158,12 +158,12 @@ Bind commands in view
 
 ```xml
 <Button Command="{Binding NavigationCommands.MoveToFirstCommand}" Width="50">&lt;&lt;</Button>
-<Button Command="{Binding NavigationCommands.MoveToPreviousCommand}" Width="50" Content="&lt;"></Button>
-<Button Command="{Binding NavigationCommands.MoveToNextCommand}" Width="50" Content="&gt;"></Button>
+<Button Command="{Binding NavigationCommands.MoveToPreviousCommand}" Width="50">&lt;/Button>
+<Button Command="{Binding NavigationCommands.MoveToNextCommand}" Width="50">&gt;</Button>
 <Button Command="{Binding NavigationCommands.MoveToLastCommand}" Width="50">&gt;&gt;</Button>
 <Button Command="{Binding NavigationCommands.NavigateCommand}" CommandParameter="HomeView">Home</Button>
 <!-- with parameter -->
-<Button Command="{Binding NavigationCommands.NavigateCommand}" CommandParameter="ViewA?id=sample-id">View A (Guards)</Button>>
+<Button Command="{Binding NavigationCommands.NavigateCommand}" CommandParameter="ViewA?id=sample-id">View A</Button>>
 ```
 
 In code
