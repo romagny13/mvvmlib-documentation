@@ -1403,8 +1403,7 @@ public class CloseTabAction : TriggerAction<Button>
         if (tabControl == null)
             return;
 
-        var view = tabItem.Content as UserDetailsView; 
-        ((MainWindowViewModel)tabControl.DataContext).NavigationService.Remove(view);
+        ((MainWindowViewModel)tabControl.DataContext).NavigationService.Remove(tabItem.Content);
     }
 }
 
