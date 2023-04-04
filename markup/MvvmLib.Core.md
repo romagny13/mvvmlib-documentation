@@ -260,7 +260,7 @@ public class User : BindableBase
 When use :
 
 * ModelWrapper  => Model not editable (or entity) without Data Annotations and/or INotifyPropertyChanged 
-* ValidatableBindableBase => Model editable with SetProperty 
+* ValidatableBindableBase => Model (or ViewModel) editable with SetProperty 
 
 
 #### ValidatableBindableBase
@@ -311,7 +311,7 @@ ViewModel Sample
 
 
 ```cs
-public class SampleViewModel: BindableBase
+public class SampleViewModel
 {
     public SampleViewModel()
     {
@@ -422,9 +422,9 @@ public class FluentValidatorAdapter<T> : MvvmLib.Mvvm.IValidator
 ViewModel Sample
 
 ```cs
-public class ModelWrapperSampleViewModel
+public class SampleViewModel
 {
-    public ModelWrapperSampleViewModel()
+    public SampleViewModel()
     {
         User = new UserWrapper(new User());
         User.ValidateOnPropertyChanged = true;

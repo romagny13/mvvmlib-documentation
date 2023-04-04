@@ -306,7 +306,7 @@ public async Task DelayedTask()
 <p>When use :</p>
 <ul>
 <li>ModelWrapper  =&gt; Model not editable (or entity) without Data Annotations and/or INotifyPropertyChanged </li>
-<li>ValidatableBindableBase =&gt; Model editable with SetProperty </li>
+<li>ValidatableBindableBase =&gt; Model (or ViewModel) editable with SetProperty </li>
 </ul>
 <h4 id="validatablebindablebase">ValidatableBindableBase<a class="headerlink" href="#validatablebindablebase" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h4>
 <p>Sample validation with Data Annotations (default validator)</p>
@@ -350,7 +350,7 @@ public class NotAllowedUserAttribute : ValidationAttribute
 </code></pre>
 
 <p>ViewModel Sample</p>
-<pre><code class="cs">public class SampleViewModel: BindableBase
+<pre><code class="cs">public class SampleViewModel
 {
     public SampleViewModel()
     {
@@ -454,9 +454,9 @@ public class FluentValidatorAdapter&lt;T&gt; : MvvmLib.Mvvm.IValidator
 </code></pre>
 
 <p>ViewModel Sample</p>
-<pre><code class="cs">public class ModelWrapperSampleViewModel
+<pre><code class="cs">public class SampleViewModel
 {
-    public ModelWrapperSampleViewModel()
+    public SampleViewModel()
     {
         User = new UserWrapper(new User());
         User.ValidateOnPropertyChanged = true;
