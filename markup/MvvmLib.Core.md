@@ -255,105 +255,112 @@ public class User : BindableBase
 }
 ```
 
-### ValidatableBase
+### Validation
 
-Allows to **validate** the model with **Data Annotations** and **custom validations**.  
+When use :
 
-
-| Property | Description |
-| --- | --- |
-|  UseDataAnnotations | Ignore or use Data Annotations for validation  |
-|  UseCustomValidations | Ignore or use Custom validations |
-|  ValidateOnPropertyChanged | False by default |
+* ModelWrapper  => Model not editable (or entity) without Data Annotations and/or INotifyPropertyChanged 
+* ValidatableBindableBase => Model editable with SetProperty 
 
 
-| Method | Description |
-| --- | --- |
-|  ValidateProperty | Validate one property  |
-|  ValidateAll | Validate all properties |
-|  Reset | Reset the errors and is submitted |
+#### ValidatableBindableBase
 
-The model requires to use SetProperty
+Sample validation with Data Annotations (default validator)
 
 ```cs
-public class User : ValidatableBase
+public class User : ValidatableBindableBase
 {
-    private string firstName;
+    private string _firstName;
+    private string _lastName;
+
+    public int Id { get; set; }
 
     [Required]
-    [StringLength(50)]
+    [StringLength(8)]
+    [NotAllowedUser("Marie")]
     public string FirstName
     {
-        get { return firstName; }
-        set { SetProperty(ref firstName, value); }
+        get { return _firstName; }
+        set { SetProperty(ref _firstName, value); }
     }
 
-    // object, list , etc.
+    [StringLength(3)]
+    public string LastName
+    {
+        get { return _lastName; }
+        set { SetProperty(ref _lastName, value); }
+    }
+}
+// A custom Validation Attribute
+public class NotAllowedUserAttribute : ValidationAttribute
+{
+    public NotAllowedUserAttribute(string name)
+    {
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+    }
+
+    public string Name { get; }
+
+    public override string FormatErrorMessage(string name) => Name + " is not allowed.";
+
+    public override bool IsValid(object value) => !string.Equals(value.ToString(), Name, StringComparison.OrdinalIgnoreCase);
 }
 ```
 
+ViewModel Sample
+
+
 ```cs
-// 1. init
-var user = new User
+public class SampleViewModel: BindableBase
 {
-    FirstName = "Marie",
-    LastName = "Bellin",
-    // etc.
-};
+    public SampleViewModel()
+    {
+        User = new User();
+        User.ValidateOnPropertyChanged = true; // false by default
+        User.ErrorsChanged += User_ErrorsChanged;
+    }
 
-// 2. Configure
-user.ValidateOnPropertyChanged = true; // false by default
- 
- // 3. Validate
+    private void User_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+    {
+        SaveCommand.RaiseCanExecuteChanged(); // Save button is disabled with errors
+    }
 
-// validate a property
-user.ValidateProperty("FirstName");
-// validate all
-user.ValidateAll();
+    public User User { get; }
 
-// validate on property change
-user.FirstName = "";
+    private DelegateCommand _saveCommand;
+    public DelegateCommand SaveCommand =>
+        _saveCommand ?? (_saveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand));
 
-// summary
-var allErrors = user.GeErrorSummary();
+    private void ExecuteSaveCommand()
+    {
+        User.Validate();
+    }
 
-if (user.HasErrors)
-{ }
-
-// reset the errors and is submitted
-user.Reset();
+    private bool CanExecuteSaveCommand() => !User.HasErrors;
+}
 ```
 
-### ModelWrapper
+#### ModelWrapper
 
-> Allows to wrap, edit and validate a model.
-
-The model does not require to use SetProperty
+Sample with a custom validator: using `FluentValidation`
 
 ```cs
 public class User
 {
     public int Id { get; set; }
-
-    [Required]
-    [StringLength(50)]
     public string FirstName { get; set; }
-
-    [StringLength(50)]
     public string LastName { get; set; }
-
-    // object, list , etc.
 }
-```
 
-Create a Generic model wrapper class
-
-```cs
 public class UserWrapper : ModelWrapper<User>
 {
     public UserWrapper(User model) : base(model)
     {
     }
+
+    // use a custom Validator
+    protected override MvvmLib.Mvvm.IValidator GetValidator()
+        => new FluentValidatorAdapter<User>(new UserValidator());
 
     public int Id { get { return Model.Id; } }
 
@@ -363,21 +370,84 @@ public class UserWrapper : ModelWrapper<User>
         set { SetValue(value); }
     }
 
-    // etc.
-
-    // custom validations
-    protected override IEnumerable<string> ValidateCustom(string propertyName)
+    public string LastName
     {
-        switch (propertyName)
-        {
-            case nameof(FirstName):
-                if (string.Equals(FirstName, "Marie", StringComparison.OrdinalIgnoreCase))
-                {
-                    yield return "Marie is not allowed";
-                }
-                break;
-        }
+        get { return GetValue<string>(); }
+        set { SetValue(value); }
     }
+}
+```
+
+Fluent Validator Adapter
+
+```cs
+public class UserValidator : AbstractValidator<User>
+{
+    public UserValidator()
+    {
+        RuleFor(x => x.FirstName).NotEmpty().MaximumLength(8);
+        RuleFor(x => x.LastName).MaximumLength(3);
+    }
+}
+
+public class FluentValidatorAdapter<T> : MvvmLib.Mvvm.IValidator
+{
+    private readonly IValidator<T> _validator;
+
+    public FluentValidatorAdapter(IValidator<T> validator)
+    {
+        _validator = validator ?? throw new ArgumentNullException(nameof(validator));
+    }
+
+    public IDictionary<string, string[]> Validate(object instance)
+    {
+        var validationResult = _validator.Validate((T)instance);
+        return validationResult.ToDictionary();
+    }
+
+    public IEnumerable<string> ValidateProperty(object instance, string propertyName)
+    {
+        var validationResult = _validator.Validate((T)instance, options => options.IncludeProperties(propertyName));
+        if (!validationResult.IsValid)
+        {
+            var dictionary = validationResult.ToDictionary();
+            if (dictionary.TryGetValue(propertyName, out var errors))
+                return errors;
+        }
+        return new List<string>();
+    }
+}
+```
+
+ViewModel Sample
+
+```cs
+public class ModelWrapperSampleViewModel
+{
+    public ModelWrapperSampleViewModel()
+    {
+        User = new UserWrapper(new User());
+        User.ValidateOnPropertyChanged = true;
+        User.ErrorsChanged += User_ErrorsChanged;
+    }
+
+    private void User_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+    {
+        SaveCommand.RaiseCanExecuteChanged();
+    }
+
+    public UserWrapper User { get; }
+
+    private DelegateCommand _saveCommand;
+    public DelegateCommand SaveCommand =>
+        _saveCommand ?? (_saveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand));
+
+    private void ExecuteSaveCommand()
+    {
+        User.Validate();
+    }
+
+    private bool CanExecuteSaveCommand() => !User.HasErrors;
 }
 ```
 
@@ -466,8 +536,12 @@ Register the eventAggregator as singleton with an ioc container.
 ```cs
 public class ShellViewModel
 {
+    private IEventAggregator _eventAggregator;
+
     public ShellViewModel(IEventAggregator eventAggregator)
-    { }
+    { 
+        _eventAggregator = eventAggregator;
+    }
 }
 ```
 

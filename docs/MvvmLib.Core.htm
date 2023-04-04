@@ -302,126 +302,101 @@ public async Task DelayedTask()
 }
 </code></pre>
 
-<h3 id="validatablebase">ValidatableBase<a class="headerlink" href="#validatablebase" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<p>Allows to <strong>validate</strong> the model with <strong>Data Annotations</strong> and <strong>custom validations</strong>.  </p>
-<table class="table table-bordered-all table-responsive">
-<thead>
-<tr>
-	<th>Property</th>
-	<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td>UseDataAnnotations</td>
-	<td>Ignore or use Data Annotations for validation</td>
-</tr>
-<tr>
-	<td>UseCustomValidations</td>
-	<td>Ignore or use Custom validations</td>
-</tr>
-<tr>
-	<td>ValidateOnPropertyChanged</td>
-	<td>False by default</td>
-</tr>
-</tbody>
-</table>
-<table class="table table-bordered-all table-responsive">
-<thead>
-<tr>
-	<th>Method</th>
-	<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td>ValidateProperty</td>
-	<td>Validate one property</td>
-</tr>
-<tr>
-	<td>ValidateAll</td>
-	<td>Validate all properties</td>
-</tr>
-<tr>
-	<td>Reset</td>
-	<td>Reset the errors and is submitted</td>
-</tr>
-</tbody>
-</table>
-<p>The model requires to use SetProperty</p>
-<pre><code class="cs">public class User : ValidatableBase
+<h3 id="validation">Validation<a class="headerlink" href="#validation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>When use :</p>
+<ul>
+<li>ModelWrapper  =&gt; Model not editable (or entity) without Data Annotations and/or INotifyPropertyChanged </li>
+<li>ValidatableBindableBase =&gt; Model editable with SetProperty </li>
+</ul>
+<h4 id="validatablebindablebase">ValidatableBindableBase<a class="headerlink" href="#validatablebindablebase" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h4>
+<p>Sample validation with Data Annotations (default validator)</p>
+<pre><code class="cs">public class User : ValidatableBindableBase
 {
-    private string firstName;
+    private string _firstName;
+    private string _lastName;
 
-    [Required]
-    [StringLength(50)]
-    public string FirstName
-    {
-        get { return firstName; }
-        set { SetProperty(ref firstName, value); }
-    }
-
-    // object, list , etc.
-}
-</code></pre>
-
-<pre><code class="cs">// 1. init
-var user = new User
-{
-    FirstName = &quot;Marie&quot;,
-    LastName = &quot;Bellin&quot;,
-    // etc.
-};
-
-// 2. Configure
-user.ValidateOnPropertyChanged = true; // false by default
- 
- // 3. Validate
-
-// validate a property
-user.ValidateProperty(&quot;FirstName&quot;);
-// validate all
-user.ValidateAll();
-
-// validate on property change
-user.FirstName = &quot;&quot;;
-
-// summary
-var allErrors = user.GeErrorSummary();
-
-if (user.HasErrors)
-{ }
-
-// reset the errors and is submitted
-user.Reset();
-</code></pre>
-
-<h3 id="modelwrapper">ModelWrapper<a class="headerlink" href="#modelwrapper" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<blockquote>
-<p>Allows to wrap, edit and validate a model.</p>
-</blockquote>
-<p>The model does not require to use SetProperty</p>
-<pre><code class="cs">public class User
-{
     public int Id { get; set; }
 
     [Required]
-    [StringLength(50)]
-    public string FirstName { get; set; }
+    [StringLength(8)]
+    [NotAllowedUser(&quot;Marie&quot;)]
+    public string FirstName
+    {
+        get { return _firstName; }
+        set { SetProperty(ref _firstName, value); }
+    }
 
-    [StringLength(50)]
-    public string LastName { get; set; }
+    [StringLength(3)]
+    public string LastName
+    {
+        get { return _lastName; }
+        set { SetProperty(ref _lastName, value); }
+    }
+}
+// A custom Validation Attribute
+public class NotAllowedUserAttribute : ValidationAttribute
+{
+    public NotAllowedUserAttribute(string name)
+    {
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+    }
 
-    // object, list , etc.
+    public string Name { get; }
+
+    public override string FormatErrorMessage(string name) =&gt; Name + &quot; is not allowed.&quot;;
+
+    public override bool IsValid(object value) =&gt; !string.Equals(value.ToString(), Name, StringComparison.OrdinalIgnoreCase);
 }
 </code></pre>
 
-<p>Create a Generic model wrapper class</p>
-<pre><code class="cs">public class UserWrapper : ModelWrapper&lt;User&gt;
+<p>ViewModel Sample</p>
+<pre><code class="cs">public class SampleViewModel: BindableBase
+{
+    public SampleViewModel()
+    {
+        User = new User();
+        User.ValidateOnPropertyChanged = true; // false by default
+        User.ErrorsChanged += User_ErrorsChanged;
+    }
+
+    private void User_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+    {
+        SaveCommand.RaiseCanExecuteChanged(); // Save button is disabled with errors
+    }
+
+    public User User { get; }
+
+    private DelegateCommand _saveCommand;
+    public DelegateCommand SaveCommand =&gt;
+        _saveCommand ?? (_saveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand));
+
+    private void ExecuteSaveCommand()
+    {
+        User.Validate();
+    }
+
+    private bool CanExecuteSaveCommand() =&gt; !User.HasErrors;
+}
+</code></pre>
+
+<h4 id="modelwrapper">ModelWrapper<a class="headerlink" href="#modelwrapper" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h4>
+<p>Sample with a custom validator: using <code>FluentValidation</code></p>
+<pre><code class="cs">public class User
+{
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+}
+
+public class UserWrapper : ModelWrapper&lt;User&gt;
 {
     public UserWrapper(User model) : base(model)
     {
     }
+
+    // use a custom Validator
+    protected override MvvmLib.Mvvm.IValidator GetValidator()
+        =&gt; new FluentValidatorAdapter&lt;User&gt;(new UserValidator());
 
     public int Id { get { return Model.Id; } }
 
@@ -431,21 +406,80 @@ user.Reset();
         set { SetValue(value); }
     }
 
-    // etc.
-
-    // custom validations
-    protected override IEnumerable&lt;string&gt; ValidateCustom(string propertyName)
+    public string LastName
     {
-        switch (propertyName)
-        {
-            case nameof(FirstName):
-                if (string.Equals(FirstName, &quot;Marie&quot;, StringComparison.OrdinalIgnoreCase))
-                {
-                    yield return &quot;Marie is not allowed&quot;;
-                }
-                break;
-        }
+        get { return GetValue&lt;string&gt;(); }
+        set { SetValue(value); }
     }
+}
+</code></pre>
+
+<p>Fluent Validator Adapter</p>
+<pre><code class="cs">public class UserValidator : AbstractValidator&lt;User&gt;
+{
+    public UserValidator()
+    {
+        RuleFor(x =&gt; x.FirstName).NotEmpty().MaximumLength(8);
+        RuleFor(x =&gt; x.LastName).MaximumLength(3);
+    }
+}
+
+public class FluentValidatorAdapter&lt;T&gt; : MvvmLib.Mvvm.IValidator
+{
+    private readonly IValidator&lt;T&gt; _validator;
+
+    public FluentValidatorAdapter(IValidator&lt;T&gt; validator)
+    {
+        _validator = validator ?? throw new ArgumentNullException(nameof(validator));
+    }
+
+    public IDictionary&lt;string, string[]&gt; Validate(object instance)
+    {
+        var validationResult = _validator.Validate((T)instance);
+        return validationResult.ToDictionary();
+    }
+
+    public IEnumerable&lt;string&gt; ValidateProperty(object instance, string propertyName)
+    {
+        var validationResult = _validator.Validate((T)instance, options =&gt; options.IncludeProperties(propertyName));
+        if (!validationResult.IsValid)
+        {
+            var dictionary = validationResult.ToDictionary();
+            if (dictionary.TryGetValue(propertyName, out var errors))
+                return errors;
+        }
+        return new List&lt;string&gt;();
+    }
+}
+</code></pre>
+
+<p>ViewModel Sample</p>
+<pre><code class="cs">public class ModelWrapperSampleViewModel
+{
+    public ModelWrapperSampleViewModel()
+    {
+        User = new UserWrapper(new User());
+        User.ValidateOnPropertyChanged = true;
+        User.ErrorsChanged += User_ErrorsChanged;
+    }
+
+    private void User_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+    {
+        SaveCommand.RaiseCanExecuteChanged();
+    }
+
+    public UserWrapper User { get; }
+
+    private DelegateCommand _saveCommand;
+    public DelegateCommand SaveCommand =&gt;
+        _saveCommand ?? (_saveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand));
+
+    private void ExecuteSaveCommand()
+    {
+        User.Validate();
+    }
+
+    private bool CanExecuteSaveCommand() =&gt; !User.HasErrors;
 }
 </code></pre>
 
@@ -519,8 +553,12 @@ user.Reset();
 <p>Register the eventAggregator as singleton with an ioc container. </p>
 <pre><code class="cs">public class ShellViewModel
 {
+    private IEventAggregator _eventAggregator;
+
     public ShellViewModel(IEventAggregator eventAggregator)
-    { }
+    { 
+        _eventAggregator = eventAggregator;
+    }
 }
 </code></pre>
 
