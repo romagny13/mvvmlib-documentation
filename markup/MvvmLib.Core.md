@@ -259,7 +259,7 @@ public class User : BindableBase
 
 When use :
 
-* ModelWrapper  => Model not editable (or entity) without Data Annotations and/or INotifyPropertyChanged 
+* ModelWrapper  => Model (or entity) not editable without Data Annotations and/or INotifyPropertyChanged 
 * ValidatableBindableBase => Model (or ViewModel) editable with SetProperty 
 
 
