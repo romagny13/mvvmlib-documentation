@@ -125,8 +125,8 @@ View model name:
 {
     // &quot;View&quot; and &quot;ViewModel&quot; folders
     var prefix  = viewType.FullName.Replace(&quot;.View.&quot;, &quot;.ViewModel.&quot;);
-    var suffix = viewType.Name.EndsWith(&quot;View&quot;) ? &quot;Model&quot; : &quot;ViewModel&quot;; 
-    var assemblyFullName = viewType.Assembly.FullName; 
+    var suffix = viewType.Name.EndsWith(&quot;View&quot;) ? &quot;Model&quot; : &quot;ViewModel&quot;;
+    var assemblyFullName = viewType.Assembly.FullName;
 
     var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, &quot;{0}{1}, {2}&quot;, prefix, suffix, assemblyFullName);
     return Type.GetType(viewModelTypeName);
@@ -141,8 +141,8 @@ View model name:
     viewType.FullName.Replace(&quot;.Menus.&quot;, &quot;.ViewModels.&quot;)
     : viewType.FullName.Replace(&quot;.Views.&quot;, &quot;.ViewModels.&quot;);
 
-    var suffix = viewType.Name.EndsWith(&quot;View&quot;) ? &quot;Model&quot; : &quot;ViewModel&quot;; 
-    var assemblyFullName = viewType.Assembly.FullName; 
+    var suffix = viewType.Name.EndsWith(&quot;View&quot;) ? &quot;Model&quot; : &quot;ViewModel&quot;;
+    var assemblyFullName = viewType.Assembly.FullName;
 
     var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, &quot;{0}{1}, {2}&quot;, prefix, suffix, assemblyFullName);
     return Type.GetType(viewModelTypeName);
@@ -329,7 +329,7 @@ NavigationService.Navigate(&quot;ViewA?tag=sample&quot;, new NavigateParameters
 });
 </code></pre>
 
-<p>It's possible to <code>navigate to ViewModels</code></p>
+<p><code>ViewModel-First</code>: It's possible to <code>navigate to ViewModels</code></p>
 <pre><code class="cs">NavigationService.Navigate(&quot;ViewAViewModel&quot;);
 </code></pre>
 
@@ -1478,7 +1478,7 @@ public class XamlTreeHelper
                         &lt;ColumnDefinition /&gt;
                     &lt;/Grid.ColumnDefinitions&gt;
                     &lt;ContentControl Content=&quot;{Binding}&quot; VerticalAlignment=&quot;Center&quot; HorizontalAlignment=&quot;Center&quot; Margin=&quot;0,0,7,0&quot; /&gt;
-                    &lt;Button Content=&quot;X&quot; 
+                    &lt;Button Content=&quot;X&quot;
                             HorizontalAlignment=&quot;Right&quot; Height=&quot;20&quot; Width=&quot;20&quot; Padding=&quot;0&quot;
                             Grid.Column=&quot;1&quot;&gt;
                         &lt;ml:Interaction.Triggers&gt;
@@ -1508,7 +1508,7 @@ public class XamlTreeHelper
 </code></pre>
 
 <p>SelectorSelectedItemsSyncBehavior</p>
-<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding Users}&quot; 
+<pre><code class="xml">&lt;ListBox ItemsSource=&quot;{Binding Users}&quot;
             SelectionMode=&quot;Multiple&quot;
             SelectedItem=&quot;{Binding SelectedUser}&quot;&gt;
     &lt;i:Interaction.Behaviors&gt;
@@ -1532,8 +1532,8 @@ public class XamlTreeHelper
         &lt;/DataTemplate&gt;
     &lt;/TreeView.Resources&gt;
     &lt;i:Interaction.Behaviors&gt;
-        &lt;ml:TreeViewSelectedItemChangedBehavior 
-            ExpandSelected=&quot;True&quot; 
+        &lt;ml:TreeViewSelectedItemChangedBehavior
+            ExpandSelected=&quot;True&quot;
             SelectedItem=&quot;{Binding ActiveFamilyOrMember}&quot; /&gt;
     &lt;/i:Interaction.Behaviors&gt;
 &lt;/TreeView&gt;

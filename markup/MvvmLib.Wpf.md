@@ -29,8 +29,8 @@ ViewModelLocationProvider.ChangeConvention((viewType) =>
 {
     // "View" and "ViewModel" folders
     var prefix  = viewType.FullName.Replace(".View.", ".ViewModel.");
-    var suffix = viewType.Name.EndsWith("View") ? "Model" : "ViewModel"; 
-    var assemblyFullName = viewType.Assembly.FullName; 
+    var suffix = viewType.Name.EndsWith("View") ? "Model" : "ViewModel";
+    var assemblyFullName = viewType.Assembly.FullName;
 
     var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "{0}{1}, {2}", prefix, suffix, assemblyFullName);
     return Type.GetType(viewModelTypeName);
@@ -47,8 +47,8 @@ ViewModelLocationProvider.ChangeConvention(viewType =>
     viewType.FullName.Replace(".Menus.", ".ViewModels.")
     : viewType.FullName.Replace(".Views.", ".ViewModels.");
 
-    var suffix = viewType.Name.EndsWith("View") ? "Model" : "ViewModel"; 
-    var assemblyFullName = viewType.Assembly.FullName; 
+    var suffix = viewType.Name.EndsWith("View") ? "Model" : "ViewModel";
+    var assemblyFullName = viewType.Assembly.FullName;
 
     var viewModelTypeName = string.Format(CultureInfo.InvariantCulture, "{0}{1}, {2}", prefix, suffix, assemblyFullName);
     return Type.GetType(viewModelTypeName);
@@ -68,7 +68,6 @@ ViewModelLocationProvider.ChangeConvention(viewType =>
     return viewModelType;
 });
 ```
-
 
 ### Register a custom View Model for a view
 
@@ -93,14 +92,13 @@ Example:
          ml:ViewModelLocator.AutoWireViewModel="True">
 ```
 
-Note: the __attached property can be omitted with a NavigationService__ (automatically tries to resolve the ViewModel for a View)
+Note: the **attached property can be omitted with a NavigationService** (automatically tries to resolve the ViewModel for a View)
 
 ## Navigation
 
 ### NavigationService
 
 > Simple, customizable, bindable, injectable with Mvvm support.
-
 
 | Method         | Description                                                         |
 | -------------- | ------------------------------------------------------------------- |
@@ -182,11 +180,12 @@ NavigationService.Navigate("ViewA?tag=sample", new NavigateParameters
 });
 ```
 
-It's possible to `navigate to ViewModels`
+`ViewModel-First`: It's possible to `navigate to ViewModels`
 
 ```cs
 NavigationService.Navigate("ViewAViewModel");
 ```
+
 _Define a DataTemplate_
 
 ```xml
@@ -867,7 +866,6 @@ Container.RegisterSingleton<IApplicationNavigationServices,ApplicationNavigation
 
 ... inject the ApplicationNavigationServices in ViewModels
 
-
 ## Showing multiple shells
 
 Create a ShellService and an interface ISupportNavigationService to set the NavigationService used by the ShellViewModel
@@ -1369,7 +1367,6 @@ xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 xmlns:ml="http://mvvmlib.com/"
 ```
 
-
 ### CallMethodAction with parameter
 
 ```xml
@@ -1439,7 +1436,7 @@ Add the trigger to the TabItem implicit Style
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <ContentControl Content="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,7,0" />
-                    <Button Content="X" 
+                    <Button Content="X"
                             HorizontalAlignment="Right" Height="20" Width="20" Padding="0"
                             Grid.Column="1">
                         <ml:Interaction.Triggers>
@@ -1476,7 +1473,7 @@ EventToCommandBehavior
 SelectorSelectedItemsSyncBehavior
 
 ```xml
-<ListBox ItemsSource="{Binding Users}" 
+<ListBox ItemsSource="{Binding Users}"
             SelectionMode="Multiple"
             SelectedItem="{Binding SelectedUser}">
     <i:Interaction.Behaviors>
@@ -1502,8 +1499,8 @@ TreeViewSelectedItemChangedBehavior
         </DataTemplate>
     </TreeView.Resources>
     <i:Interaction.Behaviors>
-        <ml:TreeViewSelectedItemChangedBehavior 
-            ExpandSelected="True" 
+        <ml:TreeViewSelectedItemChangedBehavior
+            ExpandSelected="True"
             SelectedItem="{Binding ActiveFamilyOrMember}" />
     </i:Interaction.Behaviors>
 </TreeView>

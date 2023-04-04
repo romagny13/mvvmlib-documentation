@@ -255,23 +255,16 @@ public class User : BindableBase
 }
 ```
 
-### Validatable
-
-> Validation + Edition
+### ValidatableBase
 
 Allows to **validate** the model with **Data Annotations** and **custom validations**.  
-
-| Validation Type | Description |
-| --- | --- |
-|  OnPropertyChange | Default. Validation on property changed |
-|  OnSubmit | Validation only after "ValidateAll" invoked. Validation on property changed only after "ValidateAll" invoked |
-|  Explicit | Validation only with "ValidateProperty" and "ValidateAll" |
 
 
 | Property | Description |
 | --- | --- |
 |  UseDataAnnotations | Ignore or use Data Annotations for validation  |
 |  UseCustomValidations | Ignore or use Custom validations |
+|  ValidateOnPropertyChanged | False by default |
 
 
 | Method | Description |
@@ -283,7 +276,7 @@ Allows to **validate** the model with **Data Annotations** and **custom validati
 The model requires to use SetProperty
 
 ```cs
-public class User : Validatable
+public class User : ValidatableBase
 {
     private string firstName;
 
@@ -300,6 +293,7 @@ public class User : Validatable
 ```
 
 ```cs
+// 1. init
 var user = new User
 {
     FirstName = "Marie",
@@ -307,12 +301,18 @@ var user = new User
     // etc.
 };
 
+// 2. Configure
+user.ValidateOnPropertyChanged = true; // false by default
+ 
+ // 3. Validate
 
 // validate a property
 user.ValidateProperty("FirstName");
-
 // validate all
 user.ValidateAll();
+
+// validate on property change
+user.FirstName = "";
 
 // summary
 var allErrors = user.GeErrorSummary();

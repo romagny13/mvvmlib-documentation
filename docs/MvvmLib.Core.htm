@@ -302,33 +302,8 @@ public async Task DelayedTask()
 }
 </code></pre>
 
-<h3 id="validatable">Validatable<a class="headerlink" href="#validatable" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
-<blockquote>
-<p>Validation + Edition</p>
-</blockquote>
+<h3 id="validatablebase">ValidatableBase<a class="headerlink" href="#validatablebase" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
 <p>Allows to <strong>validate</strong> the model with <strong>Data Annotations</strong> and <strong>custom validations</strong>.  </p>
-<table class="table table-bordered-all table-responsive">
-<thead>
-<tr>
-	<th>Validation Type</th>
-	<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td>OnPropertyChange</td>
-	<td>Default. Validation on property changed</td>
-</tr>
-<tr>
-	<td>OnSubmit</td>
-	<td>Validation only after &quot;ValidateAll&quot; invoked. Validation on property changed only after &quot;ValidateAll&quot; invoked</td>
-</tr>
-<tr>
-	<td>Explicit</td>
-	<td>Validation only with &quot;ValidateProperty&quot; and &quot;ValidateAll&quot;</td>
-</tr>
-</tbody>
-</table>
 <table class="table table-bordered-all table-responsive">
 <thead>
 <tr>
@@ -344,6 +319,10 @@ public async Task DelayedTask()
 <tr>
 	<td>UseCustomValidations</td>
 	<td>Ignore or use Custom validations</td>
+</tr>
+<tr>
+	<td>ValidateOnPropertyChanged</td>
+	<td>False by default</td>
 </tr>
 </tbody>
 </table>
@@ -370,7 +349,7 @@ public async Task DelayedTask()
 </tbody>
 </table>
 <p>The model requires to use SetProperty</p>
-<pre><code class="cs">public class User : Validatable
+<pre><code class="cs">public class User : ValidatableBase
 {
     private string firstName;
 
@@ -386,19 +365,26 @@ public async Task DelayedTask()
 }
 </code></pre>
 
-<pre><code class="cs">var user = new User
+<pre><code class="cs">// 1. init
+var user = new User
 {
     FirstName = &quot;Marie&quot;,
     LastName = &quot;Bellin&quot;,
     // etc.
 };
 
+// 2. Configure
+user.ValidateOnPropertyChanged = true; // false by default
+ 
+ // 3. Validate
 
 // validate a property
 user.ValidateProperty(&quot;FirstName&quot;);
-
 // validate all
 user.ValidateAll();
+
+// validate on property change
+user.FirstName = &quot;&quot;;
 
 // summary
 var allErrors = user.GeErrorSummary();
