@@ -358,10 +358,6 @@ public class UserWrapper : ModelWrapper<User>
     {
     }
 
-    // use a custom Validator
-    protected override MvvmLib.Mvvm.IValidator GetValidator()
-        => new FluentValidatorAdapter<User>(new UserValidator());
-
     public int Id { get { return Model.Id; } }
 
     public string FirstName
@@ -385,7 +381,12 @@ public class UserValidator : AbstractValidator<User>
 {
     public UserValidator()
     {
-        RuleFor(x => x.FirstName).NotEmpty().MaximumLength(8);
+        RuleFor(x => x.FirstName).NotEmpty().MaximumLength(8)
+            .MustAsync(async (firstName, cancellation) =>
+        {
+            await Task.Delay(200);
+            return !string.Equals(firstName, "Marie", StringComparison.OrdinalIgnoreCase);
+        }).WithMessage("Marie is not allowed"); ;
         RuleFor(x => x.LastName).MaximumLength(3);
     }
 }
@@ -405,9 +406,26 @@ public class FluentValidatorAdapter<T> : MvvmLib.Mvvm.IValidator
         return validationResult.ToDictionary();
     }
 
+    public async Task<IDictionary<string, string[]>> ValidateAsync(object instance)
+    {
+        var validationResult = await _validator.ValidateAsync((T)instance);
+        return validationResult.ToDictionary();
+    }
+
     public IEnumerable<string> ValidateProperty(object instance, string propertyName)
     {
         var validationResult = _validator.Validate((T)instance, options => options.IncludeProperties(propertyName));
+        return GetErrors(propertyName, validationResult);
+    }
+
+    public async Task<IEnumerable<string>> ValidatePropertyAsync(object instance, string propertyName)
+    {
+        var validationResult = await _validator.ValidateAsync((T)instance, options => options.IncludeProperties(propertyName));
+        return GetErrors(propertyName, validationResult);
+    }
+
+    protected IEnumerable<string> GetErrors(string propertyName, ValidationResult validationResult)
+    {
         if (!validationResult.IsValid)
         {
             var dictionary = validationResult.ToDictionary();
@@ -427,7 +445,11 @@ public class SampleViewModel
     public SampleViewModel()
     {
         User = new UserWrapper(new User());
+        // configure
         User.ValidateOnPropertyChanged = true;
+        User.Validator = new FluentValidatorAdapter<User>(new UserValidator());
+        User.AsyncPropertyValidation = true; // Async validation support with Fluent Validation
+
         User.ErrorsChanged += User_ErrorsChanged;
     }
 
@@ -444,7 +466,9 @@ public class SampleViewModel
 
     private void ExecuteSaveCommand()
     {
-        User.Validate();
+        // User.Validate();
+        // Async
+        User.ValidateAsync().Await();
     }
 
     private bool CanExecuteSaveCommand() => !User.HasErrors;

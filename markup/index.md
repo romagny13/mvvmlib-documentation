@@ -12,9 +12,9 @@ PM> Install-Package MvvmLib.Wpf
 IoC Container choice
 
 ```
-PM> Install-Package MvvmLib.Unity
-PM> Install-Package MvvmLib.Microsoft.DependencyInjection.Extensions
-PM> Install-Package MvvmLib.IoC.Extensions
+PM> Install-Package MvvmLib.Unity.Wpf
+PM> Install-Package MvvmLib.Microsoft.DependencyInjection.Extensions.Wpf
+PM> Install-Package MvvmLib.IoC.Extensions.Wpf
 ```
 
 <p align="center">
