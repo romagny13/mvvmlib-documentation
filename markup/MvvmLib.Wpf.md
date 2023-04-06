@@ -314,7 +314,7 @@ navigationService.RegisterViewsInExactNamespaceOf<Shell>(); // or RegisterViewsI
 
 Examples
 
-With `MvvmLib.Unity`
+With `MvvmLib.Unity.Wpf`
 
 ```cs
 public class Bootstrapper : UnityBootstrapperBase
@@ -337,7 +337,7 @@ public class Bootstrapper : UnityBootstrapperBase
 }
 ```
 
-With `MvvmLib.Microsoft.DependencyInjection.Extensions`
+With `MvvmLib.Microsoft.DependencyInjection.Extensions.Wpf`
 
 ```cs
 public class Bootstrapper : MicrosoftDependencyInjectionBootstrapperBase
@@ -359,7 +359,7 @@ public class Bootstrapper : MicrosoftDependencyInjectionBootstrapperBase
 }
 ```
 
-With `MvvmLib.IoC.Extensions`: all can be auto resolved
+With `MvvmLib.IoC.Extensions.Wpf`: all can be auto resolved
 
 ```cs
 public class Bootstrapper : InjectorBootstrapperBase

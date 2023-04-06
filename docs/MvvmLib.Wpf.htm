@@ -445,7 +445,7 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
 <p><code>NavigationService</code>: it's better to use a Bootstrapper (to register views for navigation) ...</p>
 <h2 id="bootstrapper">Bootstrapper<a class="headerlink" href="#bootstrapper" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
 <p>Examples</p>
-<p>With <code>MvvmLib.Unity</code></p>
+<p>With <code>MvvmLib.Unity.Wpf</code></p>
 <pre><code class="cs">public class Bootstrapper : UnityBootstrapperBase
 {
     protected override void RegisterTypes()
@@ -466,7 +466,7 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
 }
 </code></pre>
 
-<p>With <code>MvvmLib.Microsoft.DependencyInjection.Extensions</code></p>
+<p>With <code>MvvmLib.Microsoft.DependencyInjection.Extensions.Wpf</code></p>
 <pre><code class="cs">public class Bootstrapper : MicrosoftDependencyInjectionBootstrapperBase
 {
     protected override void RegisterTypes()
@@ -486,7 +486,7 @@ navigationService.RegisterViewsInExactNamespaceOf&lt;Shell&gt;(); // or Register
 }
 </code></pre>
 
-<p>With <code>MvvmLib.IoC.Extensions</code>: all can be auto resolved</p>
+<p>With <code>MvvmLib.IoC.Extensions.Wpf</code>: all can be auto resolved</p>
 <pre><code class="cs">public class Bootstrapper : InjectorBootstrapperBase
 {
     protected override void RegisterTypes()
