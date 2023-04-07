@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MvvmLib.SourceGenerators - MvvmLib Documentation</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="css/theme_colors.css" type="text/css" />
+    <link rel="stylesheet" href="css/styles/vs.css">
+    <link rel="stylesheet" href="css/font-awesome.4.5.0.min.css">
+</head>
+<body role="document">
+    <div class="grid-for-nav">
+        <nav data-toggle="nav-shift" class="nav-side stickynav">
+            <div class="side-nav-search">
+                <a href="index.htm"><i class="fa fa-home"></i> MvvmLib Documentation</a>
+                <div role="search">
+                    <form id="search-form" class="form" action="Docnet_search.htm" method="get">
+                        <input type="text" name="q" placeholder="Search docs" />
+                    </form>
+                </div>
+            </div>
+            <div class="menu menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+<ul>
+<li class="tocentry"><a href="index.htm">Home</a>
+</li>
+
+<li class="tocentry"><a href="MvvmLib.Core.htm">MvvmLib.Core</a>
+</li>
+<li class="tocentry"><a href="MvvmLib.Wpf.htm">MvvmLib.Wpf</a>
+</li>
+<li class="tocentry current"><a class="current" href="MvvmLib.SourceGenerators.htm">MvvmLib.SourceGenerators</a>
+<li class="tocentry"><a href="MvvmLib.Scanning.htm">MvvmLib.Scanning</a>
+</li>
+<li class="tocentry"><a href="MvvmLib.IoC.htm">MvvmLib.IoC</a>
+</li>
+<li class="tocentry"><a href="LICENSE.htm">LICENSE</a>
+</li>
+</ul>
+				<div class="toc-footer">
+					<span class="text-small">
+						<hr/>
+						<a href="https://github.com/FransBouma/DocNet" target="_blank">Made with <i class="fa fa-github"></i> DocNet</a>
+					</span>
+				</div>	
+			</div>
+            &nbsp;
+        </nav>
+        <section data-toggle="nav-shift" class="nav-content-wrap">
+            <nav class="nav-top" role="navigation" aria-label="top navigation">
+                <i data-toggle="nav-top" class="fa fa-bars"></i>
+                <a href="index.htm">MvvmLib Documentation</a>
+            </nav>
+            <div class="nav-content">
+                <div role="navigation" aria-label="breadcrumbs navigation">
+                    <div class="breadcrumbs">
+<ul><li><a href="index.htm">Home</a></li> / <li><a href="MvvmLib.SourceGenerators.htm">MvvmLib.SourceGenerators</a></li></ul>
+					
+                    </div>
+                    <hr />
+                </div>
+                <div role="main">
+                    <div class="section">
+<h1 id="mvvmlib.sourcegenerators">MvvmLib.SourceGenerators<a class="headerlink" href="#mvvmlib.sourcegenerators" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<blockquote>
+<p>Allows to generate code with <a href="https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview" target="_blank">Source Generators</a> </p>
+</blockquote>
+<p>Attributes:</p>
+<ul>
+<li>INPC attribute on class to implement INotifyPropertyChanged</li>
+<li>SetProperty attribute on fields</li>
+<li>OnPropertyChanged attribute on fields with target Property Name or empty for self</li>
+<li>Command attribute on methods for add DelegateCommand with CanExecute for CanExecute method</li>
+</ul>
+<p>Sample</p>
+<pre><code class="cs">using MvvmLib.SourceGenerators;
+using System.ComponentModel;
+
+namespace SourceGeneratorsSample.ViewModels
+{
+    [INPC]
+    public partial class ShellViewModel
+    {
+        [SetProperty]
+        [OnPropertyChanged(PropertyName = nameof(CompleteTitle))]
+        string _title;
+
+        [SetProperty]
+        bool _canChange;
+
+        public ShellViewModel()
+        {
+            _title = &quot;Initial title&quot;;
+
+            this.PropertyChanged += ShellViewModel_PropertyChanged;  
+        }
+
+        private void ShellViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CanChange))
+                ChangeTitleCommand.RaiseCanExecuteChanged();
+        }
+
+        public string CompleteTitle
+        {
+            get { return _title + &quot;!!!!&quot;; }
+        }
+
+        [Command(CanExecute = nameof(CanChangeTitle))]
+        private void ChangeTitle(string title)
+        {
+            Title = title;
+        }
+
+        private bool CanChangeTitle(string title) =&gt; _canChange;
+    }
+}
+</code></pre>
+
+<p>Generated :</p>
+<pre><code class="cs">using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using MvvmLib.Commands;
+namespace SourceGeneratorsSample.ViewModels
+{
+    partial class ShellViewModel : INotifyPropertyChanged
+    {
+        public string Title
+        {
+            get { return _title; }
+            set
+            {
+                SetProperty(ref _title, value);
+                OnPropertyChanged(&quot;CompleteTitle&quot;);
+            }
+        }
+
+        public bool CanChange
+        {
+            get { return _canChange; }
+            set { SetProperty(ref _canChange, value); }
+        }
+
+        private DelegateCommand &lt;string&gt;_changeTitleCommand;
+        public DelegateCommand &lt;string&gt;ChangeTitleCommand =&gt;
+            _changeTitleCommand?? (_changeTitleCommand = new DelegateCommand&lt;string&gt;(ChangeTitle, CanChangeTitle));
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual bool SetProperty&lt;T&gt;(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+                return false;
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}
+</code></pre>
+
+<p>Xaml </p>
+<pre><code class="xml">  &lt;Window.DataContext&gt;
+        &lt;viewModels:ShellViewModel /&gt;
+    &lt;/Window.DataContext&gt;
+    &lt;Grid&gt;
+        &lt;StackPanel HorizontalAlignment=&quot;Center&quot; VerticalAlignment=&quot;Center&quot;&gt;
+            &lt;TextBlock Text=&quot;{Binding Title}&quot; FontSize=&quot;40&quot; /&gt;
+            &lt;TextBlock Text=&quot;{Binding CompleteTitle}&quot; FontSize=&quot;40&quot; /&gt;
+            &lt;Button Command=&quot;{Binding ChangeTitleCommand}&quot; CommandParameter=&quot;New title!&quot;&gt;Change title&lt;/Button&gt;
+            &lt;CheckBox IsChecked=&quot;{Binding CanChange}&quot; Content=&quot;Can change title?&quot;/&gt;
+        &lt;/StackPanel&gt;
+    &lt;/Grid&gt;
+</code></pre>
+
+
+                    </div>
+                </div>
+                <footer>
+                    <hr />
+                    <div role="contentinfo">
+MvvmLib Documentation - &copy; 2019. <a href='https://github.com/romagny13/MvvmLib' target='_blank'>GitHub</a> | <a href='https://www.nuget.org/profiles/romagny13' target='_blank'>NuGet</a>.
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/modernizr-2.8.3.min.js"></script>
+    <script src="js/highlight.pack.js"></script>
+    <script src="js/theme.js"></script>
+
+</body>
+</html>
