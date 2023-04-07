@@ -9,7 +9,7 @@ Attributes:
 * SetProperty attribute on fields
 * OnPropertyChanged attribute on fields with target Property Name or empty for self
 * Command attribute on methods for add DelegateCommand with CanExecute for CanExecute method
-* RaiseCanExecuteChanged attribute on fields with tartget command property name
+* RaiseCanExecuteChanged attribute on fields with target command property name
 
 Sample
 
