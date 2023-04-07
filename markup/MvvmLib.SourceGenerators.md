@@ -15,7 +15,6 @@ Sample
 
 ```cs
 using MvvmLib.SourceGenerators;
-using System.ComponentModel;
 
 namespace SourceGeneratorsSample.ViewModels
 {
@@ -27,19 +26,12 @@ namespace SourceGeneratorsSample.ViewModels
         string _title;
 
         [SetProperty]
+        [RaiseCanExecuteChanged(nameof(ChangeTitleCommand))]
         bool _canChange;
 
         public ShellViewModel()
         {
             _title = "Initial title";
-
-            this.PropertyChanged += ShellViewModel_PropertyChanged;  
-        }
-
-        private void ShellViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(CanChange))
-                ChangeTitleCommand.RaiseCanExecuteChanged();
         }
 
         public string CompleteTitle
