@@ -130,3 +130,18 @@ Xaml
         </StackPanel>
     </Grid>
 ```
+
+Custom Command configuration
+
+Sample with Prism
+
+```cs
+private const string PrismCommandsNamespace = "Prism.Commands";
+
+[Command(Namespace = PrismCommandsNamespace)]
+private void ChangeTitle(string title)
+{
+    Title = title;
+}
+```
+Note: "DelegateCommand" can be changed to "RelayCommand" for example with TypeName.

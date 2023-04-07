@@ -192,6 +192,18 @@ namespace SourceGeneratorsSample.ViewModels
     &lt;/Grid&gt;
 </code></pre>
 
+<p>Custom Command configuration</p>
+<p>Sample with Prism</p>
+<pre><code class="cs">private const string PrismCommandsNamespace = &quot;Prism.Commands&quot;;
+
+[Command(Namespace = PrismCommandsNamespace)]
+private void ChangeTitle(string title)
+{
+    Title = title;
+}
+</code></pre>
+
+<p>Note: &quot;DelegateCommand&quot; can be changed to &quot;RelayCommand&quot; for example with TypeName.</p>
 
                     </div>
                 </div>
