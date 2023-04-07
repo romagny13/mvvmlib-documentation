@@ -148,9 +148,9 @@ namespace SourceGeneratorsSample.ViewModels
             set { SetProperty(ref _canChange, value); }
         }
 
-        private DelegateCommand &lt;string&gt;_changeTitleCommand;
-        public DelegateCommand &lt;string&gt;ChangeTitleCommand =&gt;
-            _changeTitleCommand?? (_changeTitleCommand = new DelegateCommand&lt;string&gt;(ChangeTitle, CanChangeTitle));
+        private DelegateCommand&lt;string&gt; _changeTitleCommand;
+        public DelegateCommand&lt;string&gt; ChangeTitleCommand =&gt;
+            _changeTitleCommand ?? (_changeTitleCommand = new DelegateCommand&lt;string&gt;(ChangeTitle, CanChangeTitle));
 
         public event PropertyChangedEventHandler PropertyChanged;
 
