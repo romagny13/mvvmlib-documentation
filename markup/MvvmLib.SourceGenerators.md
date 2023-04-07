@@ -9,6 +9,7 @@ Attributes:
 * SetProperty attribute on fields
 * OnPropertyChanged attribute on fields with target Property Name or empty for self
 * Command attribute on methods for add DelegateCommand with CanExecute for CanExecute method
+* RaiseCanExecuteChanged attribute on fields with tartget command property name
 
 Sample
 
@@ -73,15 +74,25 @@ namespace SourceGeneratorsSample.ViewModels
 			get { return _title; }
 			set
 			{
-				SetProperty(ref _title, value);
-				OnPropertyChanged("CompleteTitle");
+				if(SetProperty(ref _title, value))
+				{
+
+					OnPropertyChanged("CompleteTitle");
+				}
 			}
 		}
 
 		public bool CanChange
 		{
 			get { return _canChange; }
-			set { SetProperty(ref _canChange, value); }
+			set
+			{
+				if(SetProperty(ref _canChange, value))
+				{
+
+					ChangeTitleCommand.RaiseCanExecuteChanged();
+				}
+			}
 		}
 
 		private DelegateCommand<string> _changeTitleCommand;
@@ -107,6 +118,10 @@ namespace SourceGeneratorsSample.ViewModels
     }
 }
 ```
+
+<p>
+<img src="https://res.cloudinary.com/du6bjt9gj/image/upload/v1680900700/sourcegenerators_lw3blh.png">
+</P>
 
 Xaml 
 
