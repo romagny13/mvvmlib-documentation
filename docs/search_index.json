@@ -13,12 +13,6 @@
       "title": "MvvmLib.Wpf"
     },
     {
-      "location": "MvvmLib.SourceGenerators.htm",
-      "breadcrumbs": "Home / MvvmLib.SourceGenerators",
-      "keywords": "_canChange _changeTitleCommand _title 40 add Allows attribute Attributes be Binding bool Button CallerMemberName can Can CanChange CanChangeTitle CanExecute Center change Change changed ChangeTitle ChangeTitleCommand CheckBox class cloudinary code com command Command CommandParameter Commands CompilerServices CompleteTitle ComponentModel configuration const Content cs csharp Custom DataContext DelegateCommand dotnet du6bjt9gj empty en Equals event example false fields FontSize for generate Generated generators Generators get Grid HorizontalAlignment https if image img implement Initial INotifyPropertyChanged INPC Invoke IsChecked learn method methods microsoft MvvmLib name Name nameof namespace Namespace new New Note null on OnPropertyChanged or overview p P partial png Prism PrismCommandsNamespace private property Property PropertyChanged PropertyChangedEventArgs PropertyChangedEventHandler propertyName PropertyName protected public RaiseCanExecuteChanged ref RelayCommand res return roslyn Runtime Sample sdk self set SetProperty ShellViewModel source Source SourceGenerators sourcegenerators_lw3blh SourceGeneratorsSample src StackPanel storage string System T target Text TextBlock this title Title to true TypeName upload us using v1680900700 value VerticalAlignment viewModels ViewModels virtual void Window with Xaml xml",
-      "title": "MvvmLib.SourceGenerators"
-    },
-    {
       "location": "MvvmLib.Scanning.htm",
       "breadcrumbs": "Home / MvvmLib.Scanning",
       "keywords": "All Allows and AsImplementedInterfaces AsSelfInExactNamespaceOf assemblies attribute availables class cs Custom default Default Example filter First for found FromAssemblyOf FromCallingAssembly implementation implementations InExactNamespaceOf interface IService Last multiple MultipleImplementationTypeHandling MvvmLib new on PreferredImplementation PreferredImplementationAttribute public resolve Sample scan Scan Scanning ScanOptions Scrutor ServiceA ServiceB services Shell Strategies the Throw to type typeMaps types var views with",

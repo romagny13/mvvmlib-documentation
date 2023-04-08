@@ -21,7 +21,6 @@ _Plus_
 
 ```
 PM> Install-Package MvvmLib.Scanning
-PM> Install-Package MvvmLib.SourceGenerators
 PM> Install-Package MvvmLib.IoC
 ```
 

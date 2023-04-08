@@ -8,7 +8,6 @@
         "__index": "index.md",
         "MvvmLib.Core": "MvvmLib.Core.md",
         "MvvmLib.Wpf": "MvvmLib.Wpf.md",
-        "MvvmLib.SourceGenerators": "MvvmLib.SourceGenerators.md",
         "MvvmLib.Scanning": "MvvmLib.Scanning.md",
         "MvvmLib.IoC": "MvvmLib.IoC.md",
         "LICENSE": "LICENSE.md"
