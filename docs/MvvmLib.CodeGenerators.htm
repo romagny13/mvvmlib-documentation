@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>MvvmLib.SourceGenerators - MvvmLib Documentation</title>
+    <title>MvvmLib.CodeGenerators - MvvmLib Documentation</title>
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="css/theme.css" type="text/css" />
     <link rel="stylesheet" href="css/theme_colors.css" type="text/css" />
@@ -35,9 +35,9 @@
 </li>
 <li class="tocentry"><a href="MvvmLib.Wpf.htm">MvvmLib.Wpf</a>
 </li>
-<li class="tocentry current"><a class="current" href="MvvmLib.SourceGenerators.htm">MvvmLib.SourceGenerators</a>
 <li class="tocentry"><a href="MvvmLib.Scanning.htm">MvvmLib.Scanning</a>
 </li>
+<li class="tocentry current"><a class="current" href="MvvmLib.CodeGenerators.htm">MvvmLib.CodeGenerators</a>
 <li class="tocentry"><a href="MvvmLib.IoC.htm">MvvmLib.IoC</a>
 </li>
 <li class="tocentry"><a href="LICENSE.htm">LICENSE</a>
@@ -60,39 +60,78 @@
             <div class="nav-content">
                 <div role="navigation" aria-label="breadcrumbs navigation">
                     <div class="breadcrumbs">
-<ul><li><a href="index.htm">Home</a></li> / <li><a href="MvvmLib.SourceGenerators.htm">MvvmLib.SourceGenerators</a></li></ul>
+<ul><li><a href="index.htm">Home</a></li> / <li><a href="MvvmLib.CodeGenerators.htm">MvvmLib.CodeGenerators</a></li></ul>
 					
                     </div>
                     <hr />
                 </div>
                 <div role="main">
                     <div class="section">
-<h1 id="mvvmlib.sourcegenerators">MvvmLib.SourceGenerators<a class="headerlink" href="#mvvmlib.sourcegenerators" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<h1 id="mvvmlib.codegenerators">MvvmLib.CodeGenerators<a class="headerlink" href="#mvvmlib.codegenerators" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
 <blockquote>
 <p>Allows to generate code with <a href="https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview" target="_blank">Source Generators</a> </p>
 </blockquote>
-<p>Attributes:</p>
+<p>Support: MvvmLib, Prism (installation detected)</p>
+<p>Class Level Attributes:</p>
 <ul>
-<li>INPC attribute on class to implement INotifyPropertyChanged</li>
-<li>SetProperty attribute on fields</li>
-<li>OnPropertyChanged attribute on fields with target Property Name or empty for self</li>
-<li>Command attribute on methods for add DelegateCommand with CanExecute for CanExecute method</li>
-<li>RaiseCanExecuteChanged attribute on fields with target command property name</li>
+<li>Inpc attribute: to implement INotifyPropertyChanged</li>
+<li>BindableObject attribute: allows to add BindableBase Class (and implement IActiveAware for Prism)</li>
 </ul>
-<p>Sample</p>
-<pre><code class="cs">using MvvmLib.SourceGenerators;
+<p>Field Level Attribute:</p>
+<ul>
+<li>BindableProperty attribute: allows to use &quot;Setproperty&quot;, specify properties (OnPropertyChanged/RaisePropertyChanged) and commands (RaiseCanExecuteChanged) notified when the value has changed.</li>
+</ul>
+<p>Method Level Attribute:</p>
+<ul>
+<li>Command attribute: for add a DelegateCommand with CanExecute method and Name to specify a custom command name.</li>
+</ul>
+<p>Sample with MvvmLib</p>
+<pre><code class="cs">using MvvmLib.CodeGenerators;
 
-namespace SourceGeneratorsSample.ViewModels
+namespace CodeGeneratorsSample.ViewModels
 {
-    [INPC]
+    [BindableObject]
     public partial class ShellViewModel
     {
-        [SetProperty]
-        [OnPropertyChanged(PropertyName = nameof(CompleteTitle))]
+        [BindableProperty(nameof(CompleteTitle))]
         string _title;
 
-        [SetProperty]
-        [RaiseCanExecuteChanged(nameof(ChangeTitleCommand))]
+        [BindableProperty(CommandsToNotify = new[] { nameof(ChangeTitleCommand) })]
+        bool _canChange;
+
+        public ShellViewModel()
+        {
+            _title = &quot;Initial title&quot;;
+        }
+
+        public string CompleteTitle
+        {
+            get { return _title + &quot;!!!!&quot;; }
+        }
+
+        [Command(CanExecute = nameof(CanChangeTitle))]
+        private void ChangeTitle(string title)
+        {
+            Title = title;
+        }
+
+        private bool CanChangeTitle(string title) =&gt; _canChange;
+    }
+}
+</code></pre>
+
+<p>Prism version</p>
+<pre><code class="cs">using MvvmLib.CodeGenerators;
+
+namespace CodeGeneratorsSample.ViewModels
+{
+    [BindableObject(ImplementIActiveAware = true)]
+    public partial class ShellViewModel
+    {
+        [BindableProperty(nameof(CompleteTitle))]
+        string _title;
+
+        [BindableProperty(CommandsToNotify = new[] { nameof(ChangeTitleCommand) })]
         bool _canChange;
 
         public ShellViewModel()
@@ -117,13 +156,14 @@ namespace SourceGeneratorsSample.ViewModels
 </code></pre>
 
 <p>Generated :</p>
-<pre><code class="cs">using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using MvvmLib.Commands;
-namespace SourceGeneratorsSample.ViewModels
+<pre><code class="cs">// generated code
+using System;
+using Prism;
+using Prism.Mvvm;
+using Prism.Commands;
+namespace CodeGeneratorsSample.ViewModels
 {
-    partial class ShellViewModel : INotifyPropertyChanged
+    partial class ShellViewModel : BindableBase, IActiveAware
     {
         public string Title
         {
@@ -132,8 +172,7 @@ namespace SourceGeneratorsSample.ViewModels
             {
                 if(SetProperty(ref _title, value))
                 {
-
-                    OnPropertyChanged(&quot;CompleteTitle&quot;);
+                    RaisePropertyChanged(&quot;CompleteTitle&quot;);
                 }
             }
         }
@@ -145,7 +184,6 @@ namespace SourceGeneratorsSample.ViewModels
             {
                 if(SetProperty(ref _canChange, value))
                 {
-
                     ChangeTitleCommand.RaiseCanExecuteChanged();
                 }
             }
@@ -155,55 +193,51 @@ namespace SourceGeneratorsSample.ViewModels
         public DelegateCommand&lt;string&gt; ChangeTitleCommand =&gt;
             _changeTitleCommand ?? (_changeTitleCommand = new DelegateCommand&lt;string&gt;(ChangeTitle, CanChangeTitle));
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual bool SetProperty&lt;T&gt;(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        private bool _isActive;
+        /// &lt;summary&gt;
+        /// Gets or sets a value indicating whether the object is active.
+        /// &lt;/summary&gt;
+        public bool IsActive
         {
-            if (Equals(storage, value))
-                return false;
-
-            storage = value;
-            OnPropertyChanged(propertyName);
-            return true;
+            get { return _isActive; }
+            set
+            {
+                 _isActive = value;
+                 OnIsActiveChanged();
+            }
         }
 
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        /// &lt;summary&gt;
+        /// Notifies that the value for &lt;see cref=&quot;IsActive&quot;/&gt; property has changed.
+        /// &lt;/summary&gt;
+        public event EventHandler IsActiveChanged;
+
+        /// &lt;summary&gt;
+        /// Notifies that the value for &lt;see cref=&quot;IsActive&quot;/&gt; property has changed.
+        /// &lt;/summary&gt;
+        protected virtual void OnIsActiveChanged() =&gt; IsActiveChanged?.Invoke(this, new EventArgs());
+
     }
 }
 </code></pre>
 
 <p><p>
-<img src="https://res.cloudinary.com/du6bjt9gj/image/upload/v1680900700/sourcegenerators_lw3blh.png">
+<img src="https://res.cloudinary.com/du6bjt9gj/image/upload/v1681157130/codegenerators_u82b8y.png">
 </P></p>
 <p>Xaml </p>
-<pre><code class="xml">  &lt;Window.DataContext&gt;
-        &lt;viewModels:ShellViewModel /&gt;
-    &lt;/Window.DataContext&gt;
-    &lt;Grid&gt;
-        &lt;StackPanel HorizontalAlignment=&quot;Center&quot; VerticalAlignment=&quot;Center&quot;&gt;
-            &lt;TextBlock Text=&quot;{Binding Title}&quot; FontSize=&quot;40&quot; /&gt;
-            &lt;TextBlock Text=&quot;{Binding CompleteTitle}&quot; FontSize=&quot;40&quot; /&gt;
-            &lt;Button Command=&quot;{Binding ChangeTitleCommand}&quot; CommandParameter=&quot;New title!&quot;&gt;Change title&lt;/Button&gt;
-            &lt;CheckBox IsChecked=&quot;{Binding CanChange}&quot; Content=&quot;Can change title?&quot;/&gt;
-        &lt;/StackPanel&gt;
-    &lt;/Grid&gt;
+<pre><code class="xml">&lt;Window.DataContext&gt;
+    &lt;viewModels:ShellViewModel /&gt;
+&lt;/Window.DataContext&gt;
+&lt;Grid&gt;
+    &lt;StackPanel HorizontalAlignment=&quot;Center&quot; VerticalAlignment=&quot;Center&quot;&gt;
+        &lt;TextBlock Text=&quot;{Binding Title}&quot; FontSize=&quot;40&quot; /&gt;
+        &lt;TextBlock Text=&quot;{Binding CompleteTitle}&quot; FontSize=&quot;40&quot; /&gt;
+        &lt;Button Command=&quot;{Binding ChangeTitleCommand}&quot; CommandParameter=&quot;New title!&quot;&gt;Change title&lt;/Button&gt;
+        &lt;CheckBox IsChecked=&quot;{Binding CanChange}&quot; Content=&quot;Can change title?&quot;/&gt;
+    &lt;/StackPanel&gt;
+&lt;/Grid&gt;
 </code></pre>
 
-<p>Custom Command configuration</p>
-<p>Sample with Prism</p>
-<pre><code class="cs">private const string PrismCommandsNamespace = &quot;Prism.Commands&quot;;
-
-[Command(Namespace = PrismCommandsNamespace)]
-private void ChangeTitle(string title)
-{
-    Title = title;
-}
-</code></pre>
-
-<p>Note: &quot;DelegateCommand&quot; can be changed to &quot;RelayCommand&quot; for example with TypeName.</p>
 
                     </div>
                 </div>

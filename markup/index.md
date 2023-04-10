@@ -1,6 +1,6 @@
 # MvvmLib
 
->  Mvvm Library for .NET projects. 
+> Mvvm Library for .NET projects.
 
 ## Installation
 
@@ -22,6 +22,7 @@ _Plus_
 ```
 PM> Install-Package MvvmLib.Scanning
 PM> Install-Package MvvmLib.IoC
+PM> Install-Package MvvmLib.CodeGenerators
 ```
 
 <p align="center">
