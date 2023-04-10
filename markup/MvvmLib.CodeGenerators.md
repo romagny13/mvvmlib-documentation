@@ -17,6 +17,8 @@ Method Level Attribute:
 
 * Command attribute: for add a DelegateCommand with CanExecute method and Name to specify a custom command name.
 
+Comments supported on fields and methods for generated properties and commands.
+
 Sample with MvvmLib
 
 ```cs
